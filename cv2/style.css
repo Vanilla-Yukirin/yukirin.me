@@ -6,16 +6,16 @@
 }
 
 :root {
-    /* 可爱柔和的配色方案 */
-    --primary-color: #ff9ec7;        /* 粉色 */
-    --secondary-color: #b4a7f5;      /* 淡紫色 */
-    --accent-color: #a7d8ff;         /* 浅蓝色 */
-    --background: #fef9ff;           /* 浅粉背景 */
+    /* 可爱天蓝色配色方案 */
+    --primary-color: #33ccff;        /* 天蓝色 */
+    --secondary-color: #66b3ff;      /* 浅蓝色 */
+    --accent-color: #99d6ff;         /* 淡蓝色 */
+    --background: #f0f9ff;           /* 浅蓝背景 */
     --card-bg: #ffffff;              /* 白色卡片 */
     --text-primary: #2d2d2d;         /* 深灰文字 */
     --text-secondary: #666666;       /* 浅灰文字 */
-    --border-color: #ffe5f3;         /* 淡粉边框 */
-    --shadow: rgba(255, 158, 199, 0.1); /* 柔和阴影 */
+    --border-color: #d6f0ff;         /* 淡蓝边框 */
+    --shadow: rgba(51, 204, 255, 0.1); /* 柔和阴影 */
 }
 
 body {
@@ -111,7 +111,7 @@ body {
 
 .project-item {
     padding: 1.2rem;
-    background: linear-gradient(135deg, #fef9ff 0%, #fff5fb 100%);
+    background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     transition: transform 0.2s ease;
@@ -214,7 +214,7 @@ body {
     align-items: center;
     gap: 0.8rem;
     padding: 1rem;
-    background: linear-gradient(135deg, #fff5fb 0%, #fef9ff 100%);
+    background: linear-gradient(135deg, #e6f7ff 0%, #f0f9ff 100%);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     text-decoration: none;

@@ -73,8 +73,8 @@ function renderPage(data) {
 // 页面加载完成后执行
 document.addEventListener('DOMContentLoaded', function() {
     // 控制台彩蛋
-    console.log('%c🌸 欢迎来到 Vanilla Yukirin 的简历页面！', 'color: #ff9ec7; font-size: 16px; font-weight: bold;');
-    console.log('%c数据从 data.json 动态加载 ✨', 'color: #b4a7f5; font-size: 12px;');
+    console.log('%c💙 欢迎来到 Vanilla Yukirin 的简历页面（蓝色版）！', 'color: #33ccff; font-size: 16px; font-weight: bold;');
+    console.log('%c数据从 data.json 动态加载 ✨', 'color: #66b3ff; font-size: 12px;');
     
     // 加载数据
     loadData();

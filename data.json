@@ -1,0 +1,84 @@
+{
+  "personal": {
+    "name": "VANILLA YUKIRIN",
+    "subtitle": "数据科学 | 深度学习 | 算法竞赛",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Yukirin",
+    "info": {
+      "身份": "27届毕业生",
+      "学校": "某普通一本大学",
+      "专业": "数据科学与大数据技术",
+      "状态": "持续学习中"
+    }
+  },
+  "about": "我是一名数据科学与大数据技术专业的在读学生，对深度学习和算法竞赛充满热情。\n\n### 🏆 竞赛成就\n- **ICPC 区域赛银奖** - 国际大学生程序设计竞赛\n- **数学建模国家二等奖** (2次) - 全国大学生数学建模竞赛\n- **浙江省GPLT银奖** - 第二十二届大学生程序设计竞赛\n- **统计建模浙江省一等奖** (2次)\n\n### 💡 研究方向\n专注于医学影像分析、自然语言处理和深度学习模型优化，致力于将前沿技术应用于实际问题解决。\n\n### 🎯 技能\n**编程语言**: Python, C/C++, MATLAB  \n**深度学习**: PyTorch, TensorFlow  \n**架构**: ResNet, Transformer, ViT, U-Net",
+  "links": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/Vanilla-Yukirin",
+      "icon": "github"
+    },
+    {
+      "name": "Email",
+      "url": "mailto:contact@yukirin.me",
+      "icon": "email"
+    },
+    {
+      "name": "简历 CV",
+      "url": "/cv",
+      "icon": "cv"
+    }
+  ],
+  "projects": [
+    {
+      "title": "ResViTM-Net",
+      "link": "https://github.com/Vanilla-Yukirin",
+      "image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400",
+      "imagePosition": "left",
+      "tags": [
+        { "name": "深度学习", "color": "#33ccff" },
+        { "name": "医学影像", "color": "#66b3ff" },
+        { "name": "PyTorch", "color": "#99d6ff" }
+      ],
+      "description": "基于ResNet+ViT+Meta的CT图像肺结核识别模型，在4999份样本上达到96.0%准确率",
+      "comment": "已发表于IEEE CISAT 2025"
+    },
+    {
+      "title": "GA-TextCNN",
+      "link": "https://github.com/Vanilla-Yukirin",
+      "image": "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=400",
+      "imagePosition": "right",
+      "tags": [
+        { "name": "NLP", "color": "#3399ff" },
+        { "name": "遗传算法", "color": "#66ccff" },
+        { "name": "文本分类", "color": "#99ccff" }
+      ],
+      "description": "创新性遗传算法-TextCNN混合模型，在中文谣言检测数据集上达到97.9%准确率",
+      "comment": "统计建模竞赛浙江省一等奖"
+    },
+    {
+      "title": "分子性质预测",
+      "link": "https://github.com/Vanilla-Yukirin",
+      "image": "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400",
+      "imagePosition": "left",
+      "tags": [
+        { "name": "注意力机制", "color": "#0099ff" },
+        { "name": "分子预测", "color": "#33bbff" },
+        { "name": "性能优化", "color": "#66ccff" }
+      ],
+      "description": "基于自适应注意力机制的化学分子性质预测模型，MSE从978.3降至931.9",
+      "comment": "已发表于IEEE ICAICE 2024"
+    },
+    {
+      "title": "个人博客",
+      "link": "#",
+      "image": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=400",
+      "imagePosition": "right",
+      "tags": [
+        { "name": "技术分享", "color": "#4da6ff" },
+        { "name": "Markdown", "color": "#80bfff" }
+      ],
+      "description": "记录学习笔记、技术心得和项目经验的个人博客",
+      "comment": "持续更新中..."
+    }
+  ]
+}

@@ -1,215 +1,73 @@
-// 主页JavaScript脚本
+// 主页JavaScript脚本 - 从JSON加载数据
 
-// ============ 背景粒子动画 ============
-(function() {
-    const canvas = document.getElementById('bg-canvas');
-    if (!canvas) return;
+// ============ 加载JSON数据 ============
+async function loadData() {
+    try {
+        const response = await fetch('data.json');
+        const data = await response.json();
+        renderPage(data);
+    } catch (error) {
+        console.error('加载数据失败:', error);
+    }
+}
+
+// ============ 渲染页面 ============
+function renderPage(data) {
+    // 渲染头像和标题
+    document.getElementById('avatar').src = data.personal.avatar;
+    document.querySelector('.main-title').textContent = data.personal.name;
+    document.querySelector('.subtitle').textContent = data.personal.subtitle;
     
-    const ctx = canvas.getContext('2d');
+    // 渲染个人信息
+    const infoList = document.querySelector('.info-list');
+    infoList.innerHTML = Object.entries(data.personal.info).map(([label, value]) => `
+        <div class="info-item">
+            <span class="info-label">${label}:</span>
+            <span class="info-value">${value}</span>
+        </div>
+    `).join('');
     
-    // 设置画布大小
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+    // 渲染关于我（Markdown）
+    if (typeof marked !== 'undefined') {
+        const aboutContent = document.getElementById('about-content');
+        aboutContent.innerHTML = marked.parse(data.about);
     }
     
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    
-    // 粒子类
-    class Particle {
-        constructor() {
-            this.reset();
-        }
-        
-        reset() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.vx = (Math.random() - 0.5) * 0.5;
-            this.vy = (Math.random() - 0.5) * 0.5;
-            this.radius = Math.random() * 2 + 1;
-            this.opacity = Math.random() * 0.5 + 0.2;
-        }
-        
-        update() {
-            this.x += this.vx;
-            this.y += this.vy;
-            
-            // 边界检查
-            if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-            if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-        }
-        
-        draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(0, 255, 159, ${this.opacity})`;
-            ctx.fill();
-        }
-    }
-    
-    // 创建粒子
-    const particles = [];
-    const particleCount = 80;
-    
-    for (let i = 0; i < particleCount; i++) {
-        particles.push(new Particle());
-    }
-    
-    // 动画循环
-    function animate() {
-        ctx.fillStyle = 'rgba(10, 14, 39, 0.05)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // 更新和绘制粒子
-        particles.forEach(particle => {
-            particle.update();
-            particle.draw();
-        });
-        
-        // 绘制连接线
-        for (let i = 0; i < particles.length; i++) {
-            for (let j = i + 1; j < particles.length; j++) {
-                const dx = particles[i].x - particles[j].x;
-                const dy = particles[i].y - particles[j].y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                
-                if (distance < 120) {
-                    ctx.beginPath();
-                    ctx.strokeStyle = `rgba(0, 255, 159, ${0.15 * (1 - distance / 120)})`;
-                    ctx.lineWidth = 1;
-                    ctx.moveTo(particles[i].x, particles[i].y);
-                    ctx.lineTo(particles[j].x, particles[j].y);
-                    ctx.stroke();
-                }
-            }
-        }
-        
-        requestAnimationFrame(animate);
-    }
-    
-    animate();
-})();
+    // 渲染项目卡片
+    renderProjects(data.projects);
+}
 
-// ============ Markdown渲染 ============
-// 关于我的Markdown内容（可以修改）
-const aboutMarkdown = `
-我是一名数据科学与大数据技术专业的在读学生，对深度学习和算法竞赛充满热情。
 
-### 🏆 竞赛成就
-- **ICPC 区域赛银奖** - 国际大学生程序设计竞赛
-- **数学建模国家二等奖** (2次) - 全国大学生数学建模竞赛
-- **浙江省GPLT银奖** - 第二十二届大学生程序设计竞赛
-- **统计建模浙江省一等奖** (2次)
 
-### 💡 研究方向
-专注于医学影像分析、自然语言处理和深度学习模型优化，致力于将前沿技术应用于实际问题解决。
-
-### 🎯 技能
-**编程语言**: Python, C/C++, MATLAB  
-**深度学习**: PyTorch, TensorFlow  
-**架构**: ResNet, Transformer, ViT, U-Net
-`;
-
-// 渲染Markdown
-document.addEventListener('DOMContentLoaded', function() {
-    const aboutContent = document.getElementById('about-content');
-    if (aboutContent && typeof marked !== 'undefined') {
-        aboutContent.innerHTML = marked.parse(aboutMarkdown);
-    }
-});
-
-// ============ 项目卡片数据 ============
-// 可以方便地添加、修改或删除项目
-const projects = [
-    {
-        title: 'ResViTM-Net',
-        link: 'https://github.com/Vanilla-Yukirin',
-        background: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400',
-        tags: [
-            { name: '深度学习', color: '#ff6b9d' },
-            { name: '医学影像', color: '#c084fc' },
-            { name: 'PyTorch', color: '#fbbf24' }
-        ],
-        description: '基于ResNet+ViT+Meta的CT图像肺结核识别模型，在4999份样本上达到96.0%准确率',
-        comment: '已发表于IEEE CISAT 2025'
-    },
-    {
-        title: 'GA-TextCNN',
-        link: 'https://github.com/Vanilla-Yukirin',
-        background: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=400',
-        tags: [
-            { name: 'NLP', color: '#3b82f6' },
-            { name: '遗传算法', color: '#10b981' },
-            { name: '文本分类', color: '#f59e0b' }
-        ],
-        description: '创新性遗传算法-TextCNN混合模型，在中文谣言检测数据集上达到97.9%准确率',
-        comment: '统计建模竞赛浙江省一等奖'
-    },
-    {
-        title: '分子性质预测',
-        link: 'https://github.com/Vanilla-Yukirin',
-        background: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400',
-        tags: [
-            { name: '注意力机制', color: '#8b5cf6' },
-            { name: '分子预测', color: '#06b6d4' },
-            { name: '性能优化', color: '#f43f5e' }
-        ],
-        description: '基于自适应注意力机制的化学分子性质预测模型，MSE从978.3降至931.9',
-        comment: '已发表于IEEE ICAICE 2024'
-    },
-    {
-        title: '个人博客',
-        link: '#',
-        background: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=400',
-        tags: [
-            { name: '技术分享', color: '#ec4899' },
-            { name: 'Markdown', color: '#6366f1' }
-        ],
-        description: '记录学习笔记、技术心得和项目经验的个人博客',
-        comment: '持续更新中...'
-    },
-    // 可以继续添加更多项目...
-    // {
-    //     title: '你的项目名称',
-    //     link: '项目链接',
-    //     background: '背景图片URL',
-    //     tags: [
-    //         { name: '标签1', color: '颜色1' },
-    //         { name: '标签2', color: '颜色2' }
-    //     ],
-    //     description: '项目描述',
-    //     comment: '一句话评价'
-    // }
-];
-
-// 辅助函数：验证颜色值
+// ============ 辅助函数 ============
 function isValidColor(color) {
-    // 验证是否为有效的十六进制颜色或颜色名称
     const hexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
     const rgbPattern = /^rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)$/;
     const rgbaPattern = /^rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*[\d.]+\s*\)$/;
     return hexPattern.test(color) || rgbPattern.test(color) || rgbaPattern.test(color);
 }
 
-// 辅助函数：转义HTML
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
 
-// 渲染项目卡片
-function renderProjects() {
+// ============ 渲染项目卡片（左右布局） ============
+function renderProjects(projects) {
     const grid = document.getElementById('projects-grid');
     if (!grid) return;
     
     grid.innerHTML = projects.map(project => {
-        // 验证和清理背景URL
-        const bgStyle = project.background ? `background-image: url('${escapeHtml(project.background)}')` : '';
+        const isImageLeft = project.imagePosition === 'left';
         
-        return `
-        <a href="${escapeHtml(project.link)}" class="project-card" target="_blank" rel="noopener noreferrer" style="${bgStyle}">
+        // 图片部分
+        const imageHtml = `
+            <div class="card-image" style="background-image: url('${escapeHtml(project.image)}')"></div>
+        `;
+        
+        // 内容部分
+        const contentHtml = `
             <div class="card-content">
                 <div class="card-header">
                     <h3 class="card-title">${escapeHtml(project.title)}</h3>
@@ -221,22 +79,28 @@ function renderProjects() {
                 </div>
                 <div class="card-tags">
                     ${project.tags.map(tag => {
-                        // 验证颜色值
-                        const color = isValidColor(tag.color) ? tag.color : '#6366f1';
+                        const color = isValidColor(tag.color) ? tag.color : '#33ccff';
                         return `<span class="card-tag" style="background-color: ${color}">${escapeHtml(tag.name)}</span>`;
                     }).join('')}
                 </div>
                 <p class="card-description">${escapeHtml(project.description)}</p>
                 <p class="card-comment">${escapeHtml(project.comment)}</p>
             </div>
-        </a>
+        `;
+        
+        return `
+            <a href="${escapeHtml(project.link)}" class="project-card" target="_blank" rel="noopener noreferrer">
+                ${isImageLeft ? imageHtml + contentHtml : contentHtml + imageHtml}
+            </a>
         `;
     }).join('');
 }
 
-// 页面加载时渲染
-document.addEventListener('DOMContentLoaded', renderProjects);
-
-// ============ 控制台彩蛋 ============
-console.log('%c🌟 欢迎来到 Vanilla Yukirin 的主页！', 'color: #00ff9f; font-size: 20px; font-weight: bold;');
-console.log('%c如果你对这个网站感兴趣，欢迎访问 GitHub 查看源码 ✨', 'color: #00d4ff; font-size: 14px;');
+// ============ 页面加载 ============
+document.addEventListener('DOMContentLoaded', function() {
+    loadData();
+    
+    // 控制台彩蛋
+    console.log('%c💙 欢迎来到 Vanilla Yukirin 的主页！', 'color: #33ccff; font-size: 20px; font-weight: bold;');
+    console.log('%c数据从 data.json 动态加载 ✨', 'color: #66b3ff; font-size: 14px;');
+});
