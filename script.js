@@ -183,16 +183,36 @@ const projects = [
     // }
 ];
 
+// 辅助函数：验证颜色值
+function isValidColor(color) {
+    // 验证是否为有效的十六进制颜色或颜色名称
+    const hexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+    const rgbPattern = /^rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)$/;
+    const rgbaPattern = /^rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*[\d.]+\s*\)$/;
+    return hexPattern.test(color) || rgbPattern.test(color) || rgbaPattern.test(color);
+}
+
+// 辅助函数：转义HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // 渲染项目卡片
 function renderProjects() {
     const grid = document.getElementById('projects-grid');
     if (!grid) return;
     
-    grid.innerHTML = projects.map(project => `
-        <a href="${project.link}" class="project-card" target="_blank" rel="noopener noreferrer" style="background-image: url('${project.background}')">
+    grid.innerHTML = projects.map(project => {
+        // 验证和清理背景URL
+        const bgStyle = project.background ? `background-image: url('${escapeHtml(project.background)}')` : '';
+        
+        return `
+        <a href="${escapeHtml(project.link)}" class="project-card" target="_blank" rel="noopener noreferrer" style="${bgStyle}">
             <div class="card-content">
                 <div class="card-header">
-                    <h3 class="card-title">${project.title}</h3>
+                    <h3 class="card-title">${escapeHtml(project.title)}</h3>
                     <svg class="card-link-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                         <polyline points="15 3 21 3 21 9"></polyline>
@@ -200,15 +220,18 @@ function renderProjects() {
                     </svg>
                 </div>
                 <div class="card-tags">
-                    ${project.tags.map(tag => `
-                        <span class="card-tag" style="background-color: ${tag.color}">${tag.name}</span>
-                    `).join('')}
+                    ${project.tags.map(tag => {
+                        // 验证颜色值
+                        const color = isValidColor(tag.color) ? tag.color : '#6366f1';
+                        return `<span class="card-tag" style="background-color: ${color}">${escapeHtml(tag.name)}</span>`;
+                    }).join('')}
                 </div>
-                <p class="card-description">${project.description}</p>
-                <p class="card-comment">${project.comment}</p>
+                <p class="card-description">${escapeHtml(project.description)}</p>
+                <p class="card-comment">${escapeHtml(project.comment)}</p>
             </div>
         </a>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // 页面加载时渲染
