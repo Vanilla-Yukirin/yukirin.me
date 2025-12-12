@@ -1,9 +1,9 @@
-// 背景粒子动画
+// Background particle animation
 (function() {
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     
-    // 设置画布大小
+    // Set canvas size
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -12,7 +12,7 @@
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
     
-    // 粒子类
+    // Particle class
     class Particle {
         constructor() {
             this.reset();
@@ -31,7 +31,7 @@
             this.x += this.vx;
             this.y += this.vy;
             
-            // 边界检查
+            // Boundary check
             if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
             if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
         }
@@ -44,7 +44,7 @@
         }
     }
     
-    // 创建粒子
+    // Create particles
     const particles = [];
     const particleCount = 100;
     
@@ -52,18 +52,18 @@
         particles.push(new Particle());
     }
     
-    // 动画循环
+    // Animation loop
     function animate() {
         ctx.fillStyle = 'rgba(10, 14, 39, 0.05)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        // 更新和绘制粒子
+        // Update and draw particles
         particles.forEach(particle => {
             particle.update();
             particle.draw();
         });
         
-        // 绘制连接线
+        // Draw connection lines
         for (let i = 0; i < particles.length; i++) {
             for (let j = i + 1; j < particles.length; j++) {
                 const dx = particles[i].x - particles[j].x;
@@ -87,7 +87,7 @@
     animate();
 })();
 
-// 鼠标跟随效果
+// Mouse trail effect
 document.addEventListener('mousemove', (e) => {
     const cursor = document.createElement('div');
     cursor.style.position = 'fixed';
@@ -110,7 +110,7 @@ document.addEventListener('mousemove', (e) => {
     }, 100);
 });
 
-// 滚动显示动画
+// Scroll reveal animation
 const observerOptions = {
     threshold: 0.1,
     rootMargin: '0px 0px -50px 0px'
@@ -125,7 +125,7 @@ const observer = new IntersectionObserver((entries) => {
     });
 }, observerOptions);
 
-// 为所有section添加初始样式和观察
+// Add initial styles and observe all sections
 document.querySelectorAll('section').forEach(section => {
     section.style.opacity = '0';
     section.style.transform = 'translateY(30px)';
@@ -133,13 +133,13 @@ document.querySelectorAll('section').forEach(section => {
     observer.observe(section);
 });
 
-// 链接卡片点击反馈
+// Link card click feedback
 document.querySelectorAll('.link-card').forEach(card => {
     card.addEventListener('click', function(e) {
-        // 如果链接是 # 开头（占位符），阻止默认行为
+        // If link starts with # (placeholder), prevent default behavior
         if (this.getAttribute('href') === '#') {
             e.preventDefault();
-            // 添加一个临时的反馈效果
+            // Add temporary feedback effect
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 this.style.transform = '';
@@ -148,7 +148,7 @@ document.querySelectorAll('.link-card').forEach(card => {
     });
 });
 
-// 添加打字机效果到标题
+// Add typewriter effect to title
 function typeWriter(element, text, speed = 100) {
     let i = 0;
     element.textContent = '';
@@ -164,9 +164,9 @@ function typeWriter(element, text, speed = 100) {
     type();
 }
 
-// 页面加载完成后执行
+// Execute after page load
 window.addEventListener('load', () => {
-    // 添加淡入效果
+    // Add fade-in effect
     document.querySelector('.header').style.opacity = '0';
     document.querySelector('.header').style.transform = 'translateY(-20px)';
     document.querySelector('.header').style.transition = 'opacity 1s ease, transform 1s ease';
@@ -177,7 +177,7 @@ window.addEventListener('load', () => {
     }, 100);
 });
 
-// 控制台彩蛋
+// Console easter egg
 console.log('%c👋 Hello, Explorer!', 'color: #00ff9f; font-size: 20px; font-weight: bold;');
 console.log('%c你发现了一个彩蛋！', 'color: #00d4ff; font-size: 14px;');
 console.log('%c欢迎来到 Vanilla Yukirin 的个人主页', 'color: #94a3b8; font-size: 12px;');
