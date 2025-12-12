@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vanilla Yukirin - 数据科学与大数据技术 | 深度学习研究者">
+    <title>Vanilla Yukirin</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Markdown渲染库 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script defer src="https://was.arisumika.top/script.js" data-website-id="38b7f262-a375-4e89-a600-68f654ad249e"></script>
+</head>
+<body>
+    <!-- 背景动画画布 -->
+    <canvas id="bg-canvas"></canvas>
+    
+    <div class="container">
+        <!-- 头部区域 -->
+        <header class="hero">
+            <div class="avatar-wrapper">
+                <!-- 头像 - 可替换为自己的图片 -->
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Yukirin" alt="Avatar" class="avatar" id="avatar">
+            </div>
+            <h1 class="main-title">VANILLA YUKIRIN</h1>
+            <p class="subtitle">数据科学 | 深度学习 | 算法竞赛</p>
+        </header>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 侧边栏 -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">联系方式</h3>
+                    <div class="contact-links">
+                        <a href="https://github.com/Vanilla-Yukirin" class="contact-item" target="_blank" rel="noopener noreferrer">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                            <span>GitHub</span>
+                        </a>
+                        <a href="mailto:contact@yukirin.me" class="contact-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            <span>Email</span>
+                        </a>
+                        <a href="/cv" class="contact-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14,2 14,8 20,8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10,9 9,9 8,9"></polyline>
+                            </svg>
+                            <span>简历 CV</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">个人信息</h3>
+                    <div class="info-list">
+                        <div class="info-item">
+                            <span class="info-label">身份:</span>
+                            <span class="info-value">27届毕业生</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">学校:</span>
+                            <span class="info-value">某普通一本大学</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">专业:</span>
+                            <span class="info-value">数据科学与大数据技术</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">状态:</span>
+                            <span class="info-value">持续学习中</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 中间内容区 -->
+            <div class="content-area">
+                <!-- 关于我 - 支持Markdown -->
+                <section class="section about-section">
+                    <h2 class="section-title">[ 关于我 ]</h2>
+                    <div id="about-content" class="markdown-content">
+                        <!-- Markdown内容会被渲染到这里 -->
+                    </div>
+                </section>
+
+                <!-- 项目/作品卡片区域 -->
+                <section class="section projects-section">
+                    <h2 class="section-title">[ 项目与作品 ]</h2>
+                    <div class="cards-grid" id="projects-grid">
+                        <!-- 卡片会通过JavaScript动态生成 -->
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="footer">
+            <p>© 2024 Vanilla Yukirin · 持续学习中</p>
+            <p class="quote">"Stay hungry, stay foolish."</p>
+        </footer>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
