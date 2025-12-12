@@ -1,20 +1,33 @@
 # yukirin.me
 
-Vanilla Yukirin 的个人主页 - 简洁可爱的平坦化设计风格
+Vanilla Yukirin 的个人网站 - 科技风格主页 + 可爱简历
 
 ## ✨ 特点
 
-- 🎨 简洁可爱的平坦化设计
-- 💗 轻微二次元风格（粉色系配色）
-- 📱 完全响应式布局
-- 🔗 传送门链接（GitHub、邮箱等）
-- 📊 集成流量统计
-- 🚀 纯静态网站，无需构建工具
-- 📦 模块化设计，易于扩展
+- 🎨 **双页面设计**：科技风格主页 + 可爱简历页
+- 🌌 **粒子动画背景**：科技感十足的动态背景
+- 📱 **完全响应式布局**：移动端和桌面端完美适配
+- 🔗 **侧边栏导航**：便捷的联系方式和个人信息
+- 📝 **Markdown支持**：关于我部分支持Markdown渲染
+- 🎴 **项目卡片系统**：灵活展示项目、论文、作品
+- 📊 **集成流量统计**
+- 🚀 **纯静态网站**：无需构建工具
+
+## 📂 项目结构
+
+```
+yukirin.me/
+├── index.html          # 主页（科技风格）
+├── style.css           # 主页样式
+├── script.js           # 主页脚本（包含项目数据）
+├── cv/                 # 简历目录
+│   ├── index.html      # 简历页面（可爱风格）
+│   ├── style.css       # 简历样式
+│   └── script.js       # 简历脚本
+└── README.md           # 本文件
+```
 
 ## 🚀 快速开始
-
-这是一个纯静态网站，无需任何构建工具！
 
 ### 本地开发
 
@@ -31,7 +44,9 @@ npx http-server -p 8080
 php -S localhost:8080
 ```
 
-然后在浏览器中打开 http://localhost:8080
+然后在浏览器中打开：
+- 主页：http://localhost:8080
+- 简历：http://localhost:8080/cv
 
 ### 部署
 
@@ -43,82 +58,136 @@ php -S localhost:8080
 - Cloudflare Pages
 - 任何Web服务器 (nginx, Apache等)
 
-所有文件 (`index.html`, `style.css`, `script.js`) 都应放在Web服务器的根目录。
-
 ## 📝 自定义配置
 
-### 更新个人信息
+### 1. 修改头像
 
-编辑 `index.html` 来更新：
-- 个人详情（姓名、学历、专业）
-- 竞赛成就
-- 项目经历
-- 发表论文
-- 技术技能
-- 联系链接
-
-### 添加文章列表
-
-在 `index.html` 中找到文章列表部分（已注释），取消注释即可启用：
+编辑 `index.html` 第16行：
 
 ```html
-<!-- 取消注释以启用文章列表功能
-<section class="card">
-    <h2 class="section-title">📚 最新文章</h2>
-    <div class="articles-list">
-        <article class="article-item">
-            <h3 class="article-title">文章标题</h3>
-            <p class="article-meta">2024-12-12 · 技术分享</p>
-            <p class="article-excerpt">文章摘要...</p>
-        </article>
-    </div>
-</section>
--->
+<img src="你的头像URL" alt="Avatar" class="avatar" id="avatar">
 ```
 
-### 添加更多链接
+### 2. 修改个人简介（Markdown）
 
-在 `index.html` 的传送门区域添加新链接：
+编辑 `script.js` 中的 `aboutMarkdown` 变量（约第75行）：
+
+```javascript
+const aboutMarkdown = `
+你的Markdown内容...
+`;
+```
+
+### 3. 添加/修改项目卡片
+
+编辑 `script.js` 中的 `projects` 数组（约第95行）：
+
+```javascript
+const projects = [
+    {
+        title: '项目名称',
+        link: '项目链接',
+        background: '背景图片URL',  // 可选
+        tags: [
+            { name: '标签1', color: '#颜色1' },
+            { name: '标签2', color: '#颜色2' }
+        ],
+        description: '项目描述',
+        comment: '一句话评价'
+    },
+    // 继续添加更多项目...
+];
+```
+
+**卡片属性说明：**
+- `title`: 项目标题
+- `link`: 点击卡片跳转的链接
+- `background`: 背景图片URL（可选，留空则显示纯色）
+- `tags`: 标签数组，每个标签包含名称和颜色
+- `description`: 项目详细描述
+- `comment`: 一句话评价或补充说明（斜体显示）
+
+### 4. 修改联系方式
+
+编辑 `index.html` 中的侧边栏联系方式（约第25-48行）：
 
 ```html
-<a href="你的链接" class="link-item" target="_blank">
-    <span class="link-icon">🔗</span>
-    <div class="link-text">
-        <div class="link-name">链接名称</div>
-        <div class="link-desc">链接描述</div>
-    </div>
+<a href="你的链接" class="contact-item">
+    <svg>...</svg>
+    <span>链接名称</span>
 </a>
 ```
 
-### 修改配色
+### 5. 修改配色
+
+#### 主页配色（科技风格）
 
 编辑 `style.css` 中的CSS变量：
 
 ```css
 :root {
-    --primary-color: #ff9ec7;        /* 主色调（粉色） */
-    --secondary-color: #b4a7f5;      /* 次色调（淡紫色） */
-    --accent-color: #a7d8ff;         /* 强调色（浅蓝色） */
-    --background: #fef9ff;           /* 背景色 */
+    --primary-color: #00ff9f;        /* 主色调（青绿色） */
+    --secondary-color: #00d4ff;      /* 次色调（蓝色） */
+    --background: #0a0e27;           /* 背景色（深蓝） */
     /* ... */
 }
 ```
 
-## 🎯 可扩展区域
+#### 简历页配色（可爱风格）
 
-网站设计了多个可扩展区域，方便后续添加内容：
+编辑 `cv/style.css` 中的CSS变量。
 
-1. **文章列表** - 已在HTML中预留（注释状态）
-2. **传送门** - 可以添加更多社交媒体链接
-3. **项目经历** - 可以添加更多项目
-4. **技能标签** - 可以添加更多技术栈
+## 🎯 扩展功能
 
-所有区域都采用统一的卡片样式，添加新内容只需复制现有结构即可。
+### 添加更多卡片
+
+只需在 `script.js` 的 `projects` 数组中添加新对象即可：
+
+```javascript
+{
+    title: '新项目',
+    link: 'https://example.com',
+    background: 'https://example.com/image.jpg',
+    tags: [
+        { name: 'React', color: '#61dafb' },
+        { name: 'TypeScript', color: '#3178c6' }
+    ],
+    description: '这是一个新项目',
+    comment: '正在开发中...'
+}
+```
+
+### 修改粒子数量
+
+编辑 `script.js` 中的粒子数量（约第50行）：
+
+```javascript
+const particleCount = 80;  // 修改这个数字
+```
+
+### 禁用粒子动画
+
+如果不需要粒子动画，可以注释掉 `script.js` 中的整个粒子动画部分（第1-88行）。
+
+## 🎨 设计说明
+
+### 主页（科技风格）
+- 深色背景 + 青绿色强调
+- 粒子动画背景
+- 侧边栏布局
+- 项目卡片网格展示
+
+### 简历页（可爱风格）
+- 浅色背景 + 粉色系配色
+- 平坦化设计
+- 卡片式信息展示
+- 详细的项目和论文信息
 
 ## 🌐 浏览器支持
 
 - 现代浏览器 (Chrome, Firefox, Safari, Edge)
 - 移动浏览器 (iOS Safari, Chrome Mobile)
+- 需要支持ES6+和Canvas API
 
 ## 📄 许可证
 
