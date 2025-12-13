@@ -65,7 +65,7 @@ export default async function CVPinkPage() {
 
         {/* 发表论文 */}
         <section className={styles.card}>
-          <h2 className={styles.sectionTitle}>�� 发表论文</h2>
+          <h2 className={styles.sectionTitle}>📝 发表论文</h2>
           <ul className={styles.paperList}>
             {data.papers.map((paper, index) => (
               <li key={index}>
