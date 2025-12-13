@@ -1,4 +1,22 @@
 /* 全局样式重置 */
+@font-face {
+    font-family: 'FontLatin';
+    src: url('assets/fonts/JetBrainsMono-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+0000-00FF, U+0100-024F; /* 基本与扩展拉丁 */
+}
+
+@font-face {
+    font-family: 'FontCJK';
+    src: url('assets/fonts/SarasaMonoSlabSC-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+2E80-9FFF, U+3400-4DBF, U+F900-FAFF, U+3000-303F, U+3040-30FF, U+31F0-31FF, U+FF00-FFEF; /* CJK 及相关 */
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -19,11 +37,23 @@
 }
 
 body {
-    font-family: 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+    font-family: 'FontLatin', 'FontCJK', 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
     background: var(--background);
     color: var(--text-primary);
     line-height: 1.6;
     overflow-x: hidden;
+}
+
+/* 强化科技感：标题与卡片标题使用等宽组合 */
+.main-title,
+.section-title,
+.card-title {
+    font-family: 'FontLatin', 'FontCJK', monospace;
+}
+
+/* 标签文字用英文等宽优先，中文回退到 CJK 等宽 */
+.card-tag {
+    font-family: 'FontLatin', 'FontCJK', monospace;
 }
 
 /* 背景画布 - 已移除粒子效果 */
