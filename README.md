@@ -51,11 +51,12 @@ yukirin.me/
 
 ## 🛠️ 技术栈
 
-- **框架**: Next.js 14
+- **框架**: Next.js 14 (App Router)
 - **语言**: TypeScript
-- **样式**: CSS-in-JS (styled-jsx)
+- **样式**: CSS Modules
 - **Markdown**: marked
 - **运行时**: Node.js 18+
+- **包管理**: npm
 
 ## 📦 安装与运行
 
@@ -152,6 +153,21 @@ const response = await fetch('/api/hello', {
 - Railway
 - 自建服务器
 
+## 📚 文档
+
+- [开发指南](./DEVELOPMENT.md) - 详细的开发文档
+- [部署指南](./DEPLOYMENT.md) - 部署和运维文档
+
+## 🔧 扩展功能
+
+项目已预留以下功能接口：
+
+- **认证系统**: `app/api/auth/*`
+- **数据库操作**: `app/api/db/*`
+- **文件上传**: `app/api/upload/*`
+
+可根据需求自行实现。
+
 ## 📄 许可证
 
 ISC License
@@ -162,6 +178,13 @@ ISC License
 
 - GitHub: [@Vanilla-Yukirin](https://github.com/Vanilla-Yukirin)
 - Email: contact@yukirin.me
+
+## 🙏 致谢
+
+- [Next.js](https://nextjs.org/) - React 框架
+- [TypeScript](https://www.typescriptlang.org/) - 类型系统
+- [Marked](https://marked.js.org/) - Markdown 解析器
+- [RemixIcon](https://remixicon.com/) - 图标库
 
 ---
 
