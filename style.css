@@ -270,6 +270,19 @@ body {
     padding: 0;
 }
 
+/* Markdown 超链接样式 */
+.markdown-content a {
+    color: #FF8FAB;
+    text-decoration: underline;
+    font-weight: bold;
+    transition: color 0.2s ease;
+}
+
+.markdown-content a:hover {
+    color: #FF6B9D;
+    text-decoration: underline;
+}
+
 /* 卡片网格 */
 .cards-grid {
     display: grid;

@@ -1,5 +1,28 @@
 // 主页JavaScript脚本 - 从JSON加载数据
 
+// ============ 颜色映射 (静态色板) ============
+// 10种精选颜色，涵盖 蓝-紫-粉 色系，保持饱和度一致
+const COLOR_PALETTE = [
+    '#33CCFF', // 0: 活力青 (Primary)
+    '#3399FF', // 1: 天空蓝
+    '#5C7CFA', // 2: 靛青色
+    '#845EF7', // 3: 罗兰紫
+    '#BE4BDB', // 4: 葡萄紫
+    '#F06595', // 5: 甜心粉
+    '#FF6B6B', // 6: 珊瑚红
+    '#20C997', // 7: 青绿色 (对比色)
+    '#3BC9DB', // 8: 湖蓝色
+    '#4DABF7'  // 9: 矢车菊蓝
+];
+
+function getColorByIndex(index) {
+    // 确保 index 为整数，并循环使用色板
+    const idx = Math.round(index) % COLOR_PALETTE.length;
+    // 处理负数情况
+    const safeIdx = idx < 0 ? idx + COLOR_PALETTE.length : idx;
+    return COLOR_PALETTE[safeIdx];
+}
+
 // ============ 加载JSON数据 ============
 async function loadData() {
     try {
@@ -30,7 +53,18 @@ function renderPage(data) {
     // 渲染关于我（Markdown）
     if (typeof marked !== 'undefined') {
         const aboutContent = document.getElementById('about-content');
-        aboutContent.innerHTML = marked.parse(data.about);
+        try {
+            fetch('about.md')
+                .then(res => res.text())
+                .then(md => {
+                    aboutContent.innerHTML = marked.parse(md);
+                })
+                .catch(() => {
+                    aboutContent.innerHTML = marked.parse(data.about || '');
+                });
+        } catch (e) {
+            aboutContent.innerHTML = marked.parse(data.about || '');
+        }
     }
     
     // 渲染项目卡片
@@ -79,7 +113,7 @@ function renderProjects(projects) {
                 </div>
                 <div class="card-tags">
                     ${project.tags.map(tag => {
-                        const color = isValidColor(tag.color) ? tag.color : '#33ccff';
+                        const color = typeof tag.index === 'number' ? getColorByIndex(tag.index) : (isValidColor(tag.color) ? tag.color : '#33ccff');
                         return `<span class="card-tag" style="background-color: ${color}">${escapeHtml(tag.name)}</span>`;
                     }).join('')}
                 </div>

@@ -1,10 +1,10 @@
 {
   "personal": {
     "name": "VANILLA YUKIRIN",
-    "subtitle": "数据科学 | 深度学习 | 算法竞赛",
+    "subtitle": "Data Science | Deep Learning | Algorithm Competitions",
     "avatar": "images/avatar.png",
     "info": {
-      "身份": "27届毕业生",
+      "身份": "本科在读",
       "学校": "某普通一本大学",
       "专业": "数据科学与大数据技术",
       "状态": "持续学习中"
@@ -35,9 +35,9 @@
       "image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400",
       "imagePosition": "left",
       "tags": [
-        { "name": "深度学习", "color": "#33ccff" },
-        { "name": "医学影像", "color": "#66b3ff" },
-        { "name": "PyTorch", "color": "#99d6ff" }
+        { "name": "深度学习", "index": 0 },
+        { "name": "医学影像", "index": 1 },
+        { "name": "PyTorch", "index": 2 }
       ],
       "description": "基于ResNet+ViT+Meta的CT图像肺结核识别模型，在4999份样本上达到96.0%准确率",
       "comment": "已发表于IEEE CISAT 2025"
@@ -48,9 +48,9 @@
       "image": "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=400",
       "imagePosition": "right",
       "tags": [
-        { "name": "NLP", "color": "#3399ff" },
-        { "name": "遗传算法", "color": "#66ccff" },
-        { "name": "文本分类", "color": "#99ccff" }
+        { "name": "NLP", "index": 3 },
+        { "name": "遗传算法", "index": 4 },
+        { "name": "文本分类", "index": 5 }
       ],
       "description": "创新性遗传算法-TextCNN混合模型，在中文谣言检测数据集上达到97.9%准确率",
       "comment": "统计建模竞赛浙江省一等奖"
@@ -61,9 +61,9 @@
       "image": "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400",
       "imagePosition": "left",
       "tags": [
-        { "name": "注意力机制", "color": "#0099ff" },
-        { "name": "分子预测", "color": "#33bbff" },
-        { "name": "性能优化", "color": "#66ccff" }
+        { "name": "注意力机制", "index": 6 },
+        { "name": "分子预测", "index": 7 },
+        { "name": "性能优化", "index": 8 }
       ],
       "description": "基于自适应注意力机制的化学分子性质预测模型，MSE从978.3降至931.9",
       "comment": "已发表于IEEE ICAICE 2024"
@@ -74,8 +74,8 @@
       "image": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=400",
       "imagePosition": "right",
       "tags": [
-        { "name": "技术分享", "color": "#4da6ff" },
-        { "name": "Markdown", "color": "#80bfff" }
+        { "name": "技术分享", "index": 9 },
+        { "name": "Markdown", "index": 0 }
       ],
       "description": "记录学习笔记、技术心得和项目经验的个人博客",
       "comment": "持续更新中..."
