@@ -1,43 +1,64 @@
 /**
- * 主页组件
- * 展示个人介绍、项目作品等信息
+ * 分页页面组件
+ * 展示指定页码的项目卡片
  */
 
-import { getHomeData, getAboutContent } from '@/lib/data';
+import { notFound } from 'next/navigation';
+import { getHomeData } from '@/lib/data';
 import { paginateProjects } from '@/lib/pagination';
 import ProjectCard from '@/components/ProjectCard';
 import Pagination from '@/components/Pagination';
 import styles from './page.module.css';
 
 /**
- * 主页组件（服务端渲染）
- * 默认显示第1页
+ * 页面参数类型
  */
-export default async function HomePage() {
-  // 服务端获取数据，无需客户端 fetch
+interface PageProps {
+  params: {
+    page: string;
+  };
+}
+
+/**
+ * 生成静态路径（用于静态生成）
+ */
+export async function generateStaticParams() {
   const data = await getHomeData();
-  const aboutHtml = await getAboutContent();
+  const paginationData = paginateProjects(data.projects, 1);
+  const totalPages = paginationData.totalPages;
+
+  // 生成所有页码路径
+  return Array.from({ length: totalPages }, (_, i) => ({
+    page: String(i + 1),
+  }));
+}
+
+/**
+ * 分页页面组件（服务端渲染）
+ */
+export default async function PaginatedPage({ params }: PageProps) {
+  const pageNum = parseInt(params.page, 10);
+
+  // 验证页码
+  if (isNaN(pageNum) || pageNum < 1) {
+    notFound();
+  }
+
+  // 服务端获取数据
+  const data = await getHomeData();
   const commitSha = process.env.NEXT_PUBLIC_COMMIT_SHA || 'unknown';
   const commitUrl = process.env.NEXT_PUBLIC_COMMIT_URL || `https://github.com/Vanilla-Yukirin/yukirin.me/commit/${commitSha}`;
 
   // 分页处理
-  const paginationData = paginateProjects(data.projects, 1);
+  const paginationData = paginateProjects(data.projects, pageNum);
+
+  // 如果页码超出范围，返回404
+  if (pageNum > paginationData.totalPages) {
+    notFound();
+  }
 
   return (
     <div className={styles.container}>
-        {/* 头部区域 */}
-        <header className={styles.hero}>
-          <div className={styles.avatarWrapper}>
-            <img
-              src={data.personal.avatar}
-              alt="Avatar"
-              className={styles.avatar}
-            />
-          </div>
-          <h1 className={styles.mainTitle}>{data.personal.name}</h1>
-          <p className={styles.subtitle}>{data.personal.subtitle}</p>
-        </header>
-
         {/* 主内容区域 */}
         <div className={styles.mainContent}>
           {/* 侧边栏 */}
@@ -82,18 +103,11 @@ export default async function HomePage() {
 
           {/* 中间内容区 */}
           <div className={styles.contentArea}>
-            {/* 关于我 - Markdown 内容 */}
-            <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>[ 关于我 ]</h2>
-              <div
-                className="markdown-content"
-                dangerouslySetInnerHTML={{ __html: aboutHtml }}
-              />
-            </section>
-
             {/* 项目/作品卡片区域 */}
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>[ 项目与作品 ]</h2>
+              <h2 className={styles.sectionTitle}>
+                [ 项目与作品 - 第 {paginationData.currentPage} 页 ]
+              </h2>
               <div className={styles.cardsGrid}>
                 {paginationData.items.map((project, index) => (
                   <ProjectCard key={index} project={project} />
