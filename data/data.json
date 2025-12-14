@@ -79,6 +79,58 @@
       ],
       "description": "记录学习笔记、技术心得和项目经验的个人博客",
       "comment": "持续更新中..."
+    },
+    {
+      "title": "机器学习工具库",
+      "link": "https://github.com/Vanilla-Yukirin",
+      "image": "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400",
+      "imagePosition": "left",
+      "tags": [
+        { "name": "机器学习", "index": 1 },
+        { "name": "工具库", "index": 2 },
+        { "name": "Python", "index": 3 }
+      ],
+      "description": "常用机器学习算法和数据处理工具集合，简化建模流程",
+      "comment": "开源项目"
+    },
+    {
+      "title": "数据可视化平台",
+      "link": "https://github.com/Vanilla-Yukirin",
+      "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400",
+      "imagePosition": "right",
+      "tags": [
+        { "name": "数据可视化", "index": 4 },
+        { "name": "Web开发", "index": 5 },
+        { "name": "JavaScript", "index": 6 }
+      ],
+      "description": "交互式数据可视化平台，支持多种图表类型和实时数据更新",
+      "comment": "课程项目"
+    },
+    {
+      "title": "算法竞赛题解",
+      "link": "https://github.com/Vanilla-Yukirin",
+      "image": "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=400",
+      "imagePosition": "left",
+      "tags": [
+        { "name": "算法", "index": 7 },
+        { "name": "竞赛", "index": 8 },
+        { "name": "C++", "index": 9 }
+      ],
+      "description": "ICPC、Codeforces等算法竞赛题解和模板代码合集",
+      "comment": "持续维护"
+    },
+    {
+      "title": "深度学习实验平台",
+      "link": "https://github.com/Vanilla-Yukirin",
+      "image": "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=400",
+      "imagePosition": "right",
+      "tags": [
+        { "name": "深度学习", "index": 0 },
+        { "name": "实验平台", "index": 1 },
+        { "name": "PyTorch", "index": 2 }
+      ],
+      "description": "集成多种深度学习模型的实验平台，支持快速原型开发和对比实验",
+      "comment": "研究工具"
     }
   ]
 }
