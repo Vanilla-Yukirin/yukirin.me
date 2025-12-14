@@ -25,6 +25,8 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
+        // 统一 Node/PM2 日志的时区显示（不影响系统时区）
+        TZ: 'Asia/Shanghai',
       },
       // 日志文件路径
       error_file: './logs/err.log',

@@ -60,8 +60,8 @@ echo "🔄 启动/重启应用..."
 
 # 检查是否已经有运行的进程
 if pm2 list | grep -q "yukirin-site"; then
-  echo "应用已运行，正在重启..."
-  pm2 restart yukirin-site
+  echo "应用已运行，正在重启并更新环境变量..."
+  pm2 restart yukirin-site --update-env
 else
   echo "首次启动应用..."
   pm2 start ecosystem.config.js

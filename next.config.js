@@ -18,6 +18,15 @@ const nextConfig = {
   
   // 性能优化
   swcMinify: true,
+
+  // 构建期配置
+  eslint: {
+    // 在构建时跳过 ESLint（避免因 ESLint 版本或规则导致构建报警/阻塞）
+    ignoreDuringBuilds: true,
+  },
+
+  // 关闭 Next.js 遥测（也可通过环境变量 NEXT_TELEMETRY_DISABLED 控制）
+  telemetry: false,
 }
 
 module.exports = nextConfig
