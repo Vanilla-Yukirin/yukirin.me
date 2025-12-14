@@ -2,17 +2,17 @@
  * 全局加载器样式
  */
 
+
 .loader {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  /* 晨曦雪景渐变：上面淡粉色，下面淡冰蓝色 */
-  background: linear-gradient(to bottom, #fff0f5 0%, #e0f7fa 100%);
+  inset: 0;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 1.5rem;
+  /* 恢复粉色→蓝色的柔和渐变背景 */
+  background: linear-gradient(to bottom, #fff0f5 0%, #e0f7fa 100%);
   z-index: 9999;
   opacity: 1;
   transition: opacity 0.5s ease;
@@ -23,55 +23,80 @@
   pointer-events: none;
 }
 
-.content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
+/* 如果需要修改加载图片的大小，应下调 .wrap 内的 max-width 和 max-height。 */
+.wrap {
+  position: relative;
+  width: min(150px, 28vw);
+  height: min(150px, 28vw);
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.35);
+}
+
+.image {
+  position: absolute;
+  inset: 6px;
+  width: calc(100% - 12px);
+  height: calc(100% - 12px);
+  object-fit: cover;
+  border-radius: 50%;
+  /* 周期：1s 加速-急速-减速 + 0.2s 休息（停在0°）→ 总时长 1.2s */
+  animation: spinPulse 1.2s linear infinite;
+  will-change: transform, filter;
 }
 
 .text {
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: #2d2d2d;
   font-weight: 600;
   letter-spacing: 0.05em;
+  margin: 0;
 }
 
-/* 雪花旋转加载动画 - 旋转 + 呼吸效果 */
-.snowflake {
-  font-size: 60px;
-  color: #a8d8ea; /* 冰雪蓝 */
-  /* 复合动画：一边旋转，一边呼吸（缩放 + 透明度） */
-  animation: rotate 8s linear infinite, breathe 3s ease-in-out infinite;
-}
+/* 时快时慢旋转，并带动态模糊与停顿 */
+/* 1.2s 周期：超细腻物理模拟
+   总旋转：2160度 (6圈)
+   特点：起步蓄力 -> 中段爆发 -> 尾段超长滑行 */
+@keyframes spinPulse {
+  /* --- 阶段一：蓄力起步 (0% - 20%) --- */
+  0%    { transform: rotate(0deg);      filter: blur(0px); }
+  5%    { transform: rotate(10deg);     filter: blur(0px); }
+  10%   { transform: rotate(40deg);     filter: blur(0.2px); }
+  15%   { transform: rotate(100deg);    filter: blur(0.5px); }
+  20%   { transform: rotate(200deg);    filter: blur(1.0px); }
 
-@keyframes rotate {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
+  /* --- 阶段二：爆发加速 (20% - 45%) --- */
+  25%   { transform: rotate(380deg);    filter: blur(1.5px); }
+  30%   { transform: rotate(650deg);    filter: blur(2.0px); }
+  35%   { transform: rotate(1000deg);   filter: blur(2.5px); }
+  40%   { transform: rotate(1400deg);   filter: blur(3.0px); } /* 极速点 */
+  45%   { transform: rotate(1750deg);   filter: blur(2.8px); }
 
-@keyframes breathe {
-  0%, 100% {
-    transform: scale(0.9);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 1;
-  }
+  /* --- 阶段三：惯性滑行 (45% - 75%) --- */
+  50%   { transform: rotate(1950deg);   filter: blur(2.2px); }
+  55%   { transform: rotate(2060deg);   filter: blur(1.6px); }
+  60%   { transform: rotate(2110deg);   filter: blur(1.0px); } /* 明显慢下来了 */
+  65%   { transform: rotate(2135deg);   filter: blur(0.6px); }
+  70%   { transform: rotate(2148deg);   filter: blur(0.4px); }
+  75%   { transform: rotate(2155deg);   filter: blur(0.2px); }
+
+  /* --- 阶段四：微距修正与锁定 (75% - 100%) --- */
+  80%   { transform: rotate(2158deg);   filter: blur(0px); }
+  85%   { transform: rotate(2159.5deg); filter: blur(0px); }
+  90%   { transform: rotate(2160deg);   filter: blur(0px); } /* 彻底停稳 */
+  
+  /* 保持静止状态，给人眼休息时间 */
+  100%  { transform: rotate(2160deg);   filter: blur(0px); }
 }
 
 /* 响应式调整 */
 @media (max-width: 768px) {
-  .snowflake {
-    font-size: 48px;
-  }
-
   .text {
-    font-size: 0.875rem;
+    font-size: 0.85rem;
   }
 }

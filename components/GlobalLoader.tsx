@@ -86,12 +86,12 @@ export default function GlobalLoader() {
   }
 
   return (
-    <div className={`${styles.loader} ${fadeOut ? styles.fadeOut : ''}`}>
-      <div className={styles.content}>
-        {/* 雪花旋转加载动画 */}
-        <i className={`ri-snowy-line ${styles.snowflake}`} aria-hidden="true"></i>
-        <p className={styles.text}>加载中...</p>
+    <div className={`${styles.loader} ${fadeOut ? styles.fadeOut : ''}`} aria-busy="true" aria-live="polite">
+      <div className={styles.wrap}>
+        <div className={styles.ring} />
+        <img src="/load.png" alt="loading" className={styles.image} />
       </div>
+      <p className={styles.text}>Loading...</p>
     </div>
   );
 }
