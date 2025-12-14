@@ -40,6 +40,18 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <head>
+        {/* JetBrains Mono 字体（英文等宽） */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap"
+          rel="stylesheet"
+        />
+        {/* 思源等宽中文字体（从 CDN 加载） */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;600&display=swap"
+          rel="stylesheet"
+        />
         {/* RemixIcon 图标库 */}
         <link
           href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"

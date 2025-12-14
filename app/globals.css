@@ -16,9 +16,11 @@ body {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  /* JetBrains Mono（Google Fonts 加载，英文等宽）+ Noto Sans Mono SC（中文等宽） */
+  font-family: 'JetBrains Mono', 'Noto Sans Mono', 'Noto Sans SC', 
+    'Cascadia Code', 'SF Mono', Monaco, 'Cascadia Mono', 'Segoe UI Mono', 
+    'Consolas', 'Roboto Mono', 'Ubuntu Monospace', 'Source Code Pro', 
+    'Courier New', Courier, monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
@@ -113,6 +115,7 @@ a {
   margin-top: 1.5em;
   margin-bottom: 0.5em;
   font-weight: 600;
+  color: var(--color-primary); /* 统一使用主题蓝色 */
 }
 
 .markdown-content h1 {
