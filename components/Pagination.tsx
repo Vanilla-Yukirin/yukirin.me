@@ -5,6 +5,7 @@
 
 import Link from 'next/link';
 import { generatePageNumbers } from '@/lib/pagination';
+import { getPageUrl } from '@/lib/utils';
 import styles from './Pagination.module.css';
 
 /**
@@ -13,19 +14,16 @@ import styles from './Pagination.module.css';
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
-  basePath?: string;
 }
 
 /**
  * 分页导航组件
  * @param currentPage 当前页码
  * @param totalPages 总页数
- * @param basePath 基础路径（默认为 '/page'）
  */
 export default function Pagination({
   currentPage,
   totalPages,
-  basePath = '/page',
 }: PaginationProps) {
   // 如果只有一页，不显示分页
   if (totalPages <= 1) {
@@ -33,14 +31,6 @@ export default function Pagination({
   }
 
   const pageNumbers = generatePageNumbers(currentPage, totalPages);
-
-  // 生成页面URL
-  const getPageUrl = (page: number) => {
-    if (page === 1) {
-      return '/';
-    }
-    return `${basePath}/${page}`;
-  };
 
   return (
     <nav className={styles.pagination} aria-label="分页导航">

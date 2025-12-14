@@ -6,6 +6,7 @@
 import { notFound } from 'next/navigation';
 import { getHomeData } from '@/lib/data';
 import { paginateProjects } from '@/lib/pagination';
+import { getCommitInfo } from '@/lib/utils';
 import ProjectCard from '@/components/ProjectCard';
 import Pagination from '@/components/Pagination';
 import styles from './page.module.css';
@@ -46,8 +47,7 @@ export default async function PaginatedPage({ params }: PageProps) {
 
   // 服务端获取数据
   const data = await getHomeData();
-  const commitSha = process.env.NEXT_PUBLIC_COMMIT_SHA || 'unknown';
-  const commitUrl = process.env.NEXT_PUBLIC_COMMIT_URL || `https://github.com/Vanilla-Yukirin/yukirin.me/commit/${commitSha}`;
+  const { commitSha, commitUrl } = getCommitInfo();
 
   // 分页处理
   const paginationData = paginateProjects(data.projects, pageNum);
