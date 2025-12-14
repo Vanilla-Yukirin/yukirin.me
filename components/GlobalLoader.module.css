@@ -1,0 +1,120 @@
+/**
+ * 全局加载器样式
+ */
+
+.loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #f0f8ff 0%, #e6f4ff 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+.loader.fadeOut {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.text {
+  font-size: 1rem;
+  color: #2d2d2d;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+/* 旋转加载动画 - 三个同心圆环 */
+.spinner {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.spinnerRing {
+  position: absolute;
+  border: 3px solid transparent;
+  border-top-color: #33ccff;
+  border-radius: 50%;
+  animation: spin 1.5s linear infinite;
+}
+
+.spinnerRing:nth-child(1) {
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 80px;
+  border-top-color: #33ccff;
+  animation-duration: 1.5s;
+}
+
+.spinnerRing:nth-child(2) {
+  top: 10px;
+  left: 10px;
+  width: 60px;
+  height: 60px;
+  border-top-color: #66b3ff;
+  animation-duration: 1.2s;
+  animation-direction: reverse;
+}
+
+.spinnerRing:nth-child(3) {
+  top: 20px;
+  left: 20px;
+  width: 40px;
+  height: 40px;
+  border-top-color: #99d6ff;
+  animation-duration: 1s;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .spinner {
+    width: 60px;
+    height: 60px;
+  }
+
+  .spinnerRing:nth-child(1) {
+    width: 60px;
+    height: 60px;
+  }
+
+  .spinnerRing:nth-child(2) {
+    top: 8px;
+    left: 8px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .spinnerRing:nth-child(3) {
+    top: 16px;
+    left: 16px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .text {
+    font-size: 0.875rem;
+  }
+}

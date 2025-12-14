@@ -5,6 +5,7 @@
 
 import type { Metadata } from 'next';
 import './globals.css';
+import GlobalLoader from '@/components/GlobalLoader';
 
 /**
  * 网站元数据配置
@@ -40,16 +41,16 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <head>
-        {/* JetBrains Mono 字体（英文等宽） */}
+        {/* JetBrains Mono 字体（英文等宽） - display=block 防止字体闪烁 */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
-          href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=block"
           rel="stylesheet"
         />
-        {/* 思源等宽中文字体（从 CDN 加载） */}
+        {/* 思源等宽中文字体（从 CDN 加载） - display=block 防止字体闪烁 */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;600&display=block"
           rel="stylesheet"
         />
         {/* RemixIcon 图标库 */}
@@ -64,7 +65,10 @@ export default function RootLayout({
           data-website-id="38b7f262-a375-4e89-a600-68f654ad249e"
         ></script>
       </head>
-      <body>{children}</body>
+      <body>
+        <GlobalLoader />
+        {children}
+      </body>
     </html>
   );
 }
