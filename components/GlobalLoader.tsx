@@ -18,6 +18,20 @@ export default function GlobalLoader() {
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
+    let fadeTimeout: NodeJS.Timeout | null = null;
+    
+    // 安全地触发淡出效果
+    const triggerFadeOut = () => {
+      if (!mounted) return;
+      setFadeOut(true);
+      fadeTimeout = setTimeout(() => {
+        if (mounted) {
+          setLoading(false);
+        }
+      }, FADE_OUT_DURATION_MS);
+    };
+
     // 检查字体是否加载完成
     const checkFontsLoaded = async () => {
       try {
@@ -25,39 +39,38 @@ export default function GlobalLoader() {
         if (typeof document !== 'undefined' && 'fonts' in document) {
           // 等待所有字体加载完成
           await document.fonts.ready;
+          
+          // 额外等待一小段时间确保渲染稳定
+          await new Promise((resolve) => setTimeout(resolve, RENDER_STABILIZATION_DELAY_MS));
+          
+          // 开始淡出动画
+          triggerFadeOut();
+        } else {
+          // 不支持 Font Loading API，使用较短的固定延迟后淡出
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          triggerFadeOut();
         }
-        
-        // 额外等待一小段时间确保渲染稳定
-        await new Promise((resolve) => setTimeout(resolve, RENDER_STABILIZATION_DELAY_MS));
-        
-        // 开始淡出动画
-        setFadeOut(true);
-        
-        // 淡出完成后移除加载器
-        setTimeout(() => {
-          setLoading(false);
-        }, FADE_OUT_DURATION_MS);
       } catch (error) {
         // 如果字体加载失败，也要移除加载器
         console.error('Font loading detection failed:', error);
-        setFadeOut(true);
-        setTimeout(() => {
-          setLoading(false);
-        }, FADE_OUT_DURATION_MS);
+        triggerFadeOut();
       }
     };
 
     // 设置超时保护，防止加载器永久显示
-    const timeout = setTimeout(() => {
-      setFadeOut(true);
-      setTimeout(() => {
-        setLoading(false);
-      }, FADE_OUT_DURATION_MS);
+    const maxTimeout = setTimeout(() => {
+      triggerFadeOut();
     }, MAX_LOADING_TIME_MS);
 
     checkFontsLoaded();
 
-    return () => clearTimeout(timeout);
+    return () => {
+      mounted = false;
+      clearTimeout(maxTimeout);
+      if (fadeTimeout) {
+        clearTimeout(fadeTimeout);
+      }
+    };
   }, []);
 
   // 加载完成后不渲染
