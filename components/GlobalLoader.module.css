@@ -8,7 +8,8 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #f0f8ff 0%, #e6f4ff 100%);
+  /* 晨曦雪景渐变：上面淡粉色，下面淡冰蓝色 */
+  background: linear-gradient(to bottom, #fff0f5 0%, #e0f7fa 100%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -36,50 +37,15 @@
   letter-spacing: 0.05em;
 }
 
-/* 旋转加载动画 - 三个同心圆环 */
-.spinner {
-  position: relative;
-  width: 80px;
-  height: 80px;
+/* 雪花旋转加载动画 - 旋转 + 呼吸效果 */
+.snowflake {
+  font-size: 60px;
+  color: #a8d8ea; /* 冰雪蓝 */
+  /* 复合动画：一边旋转，一边呼吸（缩放 + 透明度） */
+  animation: rotate 8s linear infinite, breathe 3s ease-in-out infinite;
 }
 
-.spinnerRing {
-  position: absolute;
-  border: 3px solid transparent;
-  border-top-color: #33ccff;
-  border-radius: 50%;
-  animation: spin 1.5s linear infinite;
-}
-
-.spinnerRing:nth-child(1) {
-  top: 0;
-  left: 0;
-  width: 80px;
-  height: 80px;
-  border-top-color: #33ccff;
-  animation-duration: 1.5s;
-}
-
-.spinnerRing:nth-child(2) {
-  top: 10px;
-  left: 10px;
-  width: 60px;
-  height: 60px;
-  border-top-color: #66b3ff;
-  animation-duration: 1.2s;
-  animation-direction: reverse;
-}
-
-.spinnerRing:nth-child(3) {
-  top: 20px;
-  left: 20px;
-  width: 40px;
-  height: 40px;
-  border-top-color: #99d6ff;
-  animation-duration: 1s;
-}
-
-@keyframes spin {
+@keyframes rotate {
   0% {
     transform: rotate(0deg);
   }
@@ -88,30 +54,21 @@
   }
 }
 
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
 /* 响应式调整 */
 @media (max-width: 768px) {
-  .spinner {
-    width: 60px;
-    height: 60px;
-  }
-
-  .spinnerRing:nth-child(1) {
-    width: 60px;
-    height: 60px;
-  }
-
-  .spinnerRing:nth-child(2) {
-    top: 8px;
-    left: 8px;
-    width: 44px;
-    height: 44px;
-  }
-
-  .spinnerRing:nth-child(3) {
-    top: 16px;
-    left: 16px;
-    width: 28px;
-    height: 28px;
+  .snowflake {
+    font-size: 48px;
   }
 
   .text {

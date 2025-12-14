@@ -88,12 +88,8 @@ export default function GlobalLoader() {
   return (
     <div className={`${styles.loader} ${fadeOut ? styles.fadeOut : ''}`}>
       <div className={styles.content}>
-        {/* 简单的旋转加载动画 */}
-        <div className={styles.spinner}>
-          <div className={styles.spinnerRing}></div>
-          <div className={styles.spinnerRing}></div>
-          <div className={styles.spinnerRing}></div>
-        </div>
+        {/* 雪花旋转加载动画 */}
+        <i className={`ri-snowy-line ${styles.snowflake}`} aria-hidden="true"></i>
         <p className={styles.text}>加载中...</p>
       </div>
     </div>
