@@ -4,27 +4,28 @@
  */
 
 /**
- * 主页科技风格色板（蓝-青色系）
+ * 主页浅蓝色风格色板（原网站设计）
  */
 export const TECH_COLORS = {
   // 主色调
   primary: '#33CCFF',      // 活力青
-  secondary: '#00d4ff',    // 天空蓝
-  accent: '#00ff9f',       // 荧光绿（强调色）
+  secondary: '#66b3ff',    // 天空蓝
+  accent: '#33ccff',       // 强调色
   
   // 背景色
-  bgDark: '#0a0e27',       // 深色背景
-  bgCard: '#1a1f3a',       // 卡片背景
-  bgHover: '#252b47',      // 悬停背景
+  bgLight: '#f0f8ff',      // 浅蓝背景
+  bgCard: '#ffffff',       // 卡片背景（白色）
+  bgHover: '#e6f7ff',      // 悬停背景
+  bgSidebar: '#e6f7ff',    // 侧边栏背景
   
   // 文字色
-  textPrimary: '#ffffff',  // 主文字
-  textSecondary: '#a0aec0', // 次要文字
-  textMuted: '#718096',    // 弱化文字
+  textPrimary: '#2d2d2d',  // 主文字（深色）
+  textSecondary: '#666666', // 次要文字
+  textMuted: '#999999',    // 弱化文字
   
   // 边框
-  border: '#2d3748',       // 边框色
-  borderLight: '#374151',  // 浅边框
+  border: '#d6f0ff',       // 边框色
+  borderLight: '#e6f7ff',  // 浅边框
 } as const;
 
 /**

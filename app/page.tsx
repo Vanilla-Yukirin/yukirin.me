@@ -4,7 +4,6 @@
  */
 
 import { getHomeData, getAboutContent } from '@/lib/data';
-import BackgroundCanvas from '@/components/BackgroundCanvas';
 import ProjectCard from '@/components/ProjectCard';
 import styles from './page.module.css';
 
@@ -17,11 +16,7 @@ export default async function HomePage() {
   const aboutHtml = await getAboutContent();
 
   return (
-    <>
-      {/* 背景动画画布 */}
-      <BackgroundCanvas />
-
-      <div className={styles.container}>
+    <div className={styles.container}>
         {/* 头部区域 */}
         <header className={styles.hero}>
           <div className={styles.avatarWrapper}>
@@ -105,7 +100,6 @@ export default async function HomePage() {
           <p>© 2025 Vanilla Yukirin · 永远可爱 · 永远善良</p>
           <p className={styles.quote}>&quot;Stay hungry, stay foolish.&quot;</p>
         </footer>
-      </div>
-    </>
+    </div>
   );
 }

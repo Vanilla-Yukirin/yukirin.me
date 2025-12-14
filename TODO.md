@@ -28,38 +28,7 @@ import Image from 'next/image';
 - 响应式图片
 - 更好的性能
 
-### 2. 背景动画边界检测优化
-**位置**: `components/BackgroundCanvas.tsx` (lines 53-54)
-**问题**: 粒子边界碰撞逻辑可能导致粒子卡在边界
-**建议**:
-```typescript
-update() {
-  this.x += this.vx;
-  this.y += this.vy;
-
-  // 改进的边界检测
-  if (this.x < 0) {
-    this.x = 0;
-    this.vx = Math.abs(this.vx);
-  } else if (this.x > canvas.width) {
-    this.x = canvas.width;
-    this.vx = -Math.abs(this.vx);
-  }
-  
-  if (this.y < 0) {
-    this.y = 0;
-    this.vy = Math.abs(this.vy);
-  } else if (this.y > canvas.height) {
-    this.y = canvas.height;
-    this.vy = -Math.abs(this.vy);
-  }
-}
-```
-**收益**: 
-- 更流畅的粒子运动
-- 避免边界卡顿
-
-### 3. 外部脚本安全性
+### 2. 外部脚本安全性
 **位置**: `app/layout.tsx` (lines 49-53)
 **问题**: 加载外部脚本没有完整性检查
 **建议**: 

@@ -1,6 +1,9 @@
 /* 主页样式模块 */
 
 .container {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
   max-width: 1400px;
   margin: 0 auto;
   padding: var(--spacing-xl);

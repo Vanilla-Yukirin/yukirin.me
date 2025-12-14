@@ -22,6 +22,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
+  /* 原网站的浅蓝色渐变背景 */
+  background: linear-gradient(135deg, #f0f8ff 0%, #e6f4ff 100%);
+  min-height: 100vh;
 }
 
 a {
@@ -29,26 +32,27 @@ a {
   text-decoration: none;
 }
 
-/* 全局 CSS 变量 - 科技风格（主页） */
+/* 全局 CSS 变量 - 原网站风格（浅蓝色） */
 :root {
   /* 主色调 */
   --color-primary: #33ccff;
-  --color-secondary: #00d4ff;
-  --color-accent: #00ff9f;
+  --color-secondary: #66b3ff;
+  --color-accent: #33ccff;
   
   /* 背景色 */
-  --color-bg-dark: #0a0e27;
-  --color-bg-card: #1a1f3a;
-  --color-bg-hover: #252b47;
+  --color-bg-light: #f0f8ff;
+  --color-bg-card: #ffffff;
+  --color-bg-hover: #e6f7ff;
+  --color-sidebar-bg: #e6f7ff;
   
   /* 文字色 */
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #a0aec0;
-  --color-text-muted: #718096;
+  --color-text-primary: #2d2d2d;
+  --color-text-secondary: #666666;
+  --color-text-muted: #999999;
   
   /* 边框 */
-  --color-border: #2d3748;
-  --color-border-light: #374151;
+  --color-border: #d6f0ff;
+  --color-border-light: #e6f7ff;
   
   /* 间距 */
   --spacing-xs: 0.25rem;
