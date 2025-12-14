@@ -87,15 +87,13 @@ export default function Pagination({
         )}
       </div>
 
-      {/* 回到首页链接（仅在非首页显示） */}
-      {currentPage > 1 && (
-        <div className={styles.homeLink}>
-          <Link href="/" className={styles.homeLinkButton}>
-            <i className="ri-home-line"></i>
-            <span>回到首页</span>
-          </Link>
-        </div>
-      )}
+      {/* 回到首页链接（在分页页面显示） */}
+      <div className={styles.homeLink}>
+        <Link href="/" className={styles.homeLinkButton}>
+          <i className="ri-home-line"></i>
+          <span>回到首页</span>
+        </Link>
+      </div>
     </nav>
   );
 }
