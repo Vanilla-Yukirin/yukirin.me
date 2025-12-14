@@ -1,0 +1,67 @@
+/* 分页页面样式模块 */
+
+.container {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-xl);
+}
+
+/* 主内容区域 - 不显示侧边栏，内容居中 */
+.mainContent {
+  max-width: 1000px;
+  margin: var(--spacing-2xl) auto 0;
+  width: 100%;
+}
+
+.section {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-lg);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cardsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.footer {
+  text-align: center;
+  padding: var(--spacing-2xl) 0;
+  color: var(--color-text-secondary);
+  border-top: 1px solid var(--color-border);
+  margin-top: var(--spacing-2xl);
+}
+
+.footer p {
+  margin: var(--spacing-sm) 0;
+}
+
+.quote {
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+
+  .section {
+    padding: var(--spacing-lg);
+  }
+}

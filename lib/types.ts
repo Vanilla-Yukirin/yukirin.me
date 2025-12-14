@@ -33,6 +33,8 @@ export interface Project {
   tags: ProjectTag[];
   description: string;
   comment: string;
+  pin?: boolean;        // 是否在首页置顶显示（类似GitHub的pin功能）
+  sortId?: number;      // 排序编号，数字越大越靠前，允许负数
 }
 
 /**

@@ -1,21 +1,27 @@
 /**
  * 主页组件
- * 展示个人介绍、项目作品等信息
+ * 展示个人介绍、置顶项目等信息
  */
 
+import Link from 'next/link';
 import { getHomeData, getAboutContent } from '@/lib/data';
+import { getPinnedProjects } from '@/lib/pagination';
+import { getCommitInfo } from '@/lib/utils';
 import ProjectCard from '@/components/ProjectCard';
 import styles from './page.module.css';
 
 /**
  * 主页组件（服务端渲染）
+ * 只展示置顶（pin=true）的项目
  */
 export default async function HomePage() {
   // 服务端获取数据，无需客户端 fetch
   const data = await getHomeData();
   const aboutHtml = await getAboutContent();
-  const commitSha = process.env.NEXT_PUBLIC_COMMIT_SHA || 'unknown';
-  const commitUrl = process.env.NEXT_PUBLIC_COMMIT_URL || `https://github.com/Vanilla-Yukirin/yukirin.me/commit/${commitSha}`;
+  const { commitSha, commitUrl } = getCommitInfo();
+
+  // 获取置顶项目（pin=true的项目，已按sortId降序排序）
+  const pinnedProjects = getPinnedProjects(data.projects);
 
   return (
     <div className={styles.container}>
@@ -85,13 +91,21 @@ export default async function HomePage() {
               />
             </section>
 
-            {/* 项目/作品卡片区域 */}
+            {/* 项目/作品卡片区域 - 仅显示置顶项目 */}
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>[ 项目与作品 ]</h2>
+              <h2 className={styles.sectionTitle}>[ 精选项目 ]</h2>
               <div className={styles.cardsGrid}>
-                {data.projects.map((project, index) => (
+                {pinnedProjects.map((project, index) => (
                   <ProjectCard key={index} project={project} />
                 ))}
+              </div>
+
+              {/* 查看更多按钮 - 跳转到完整项目列表的第1页 */}
+              <div className={styles.viewMoreWrapper}>
+                <Link href="/page/1" className={styles.viewMoreButton}>
+                  <span>查看更多项目</span>
+                  <i className="ri-arrow-right-line"></i>
+                </Link>
               </div>
             </section>
           </div>

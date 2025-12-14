@@ -7,6 +7,8 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: var(--spacing-xl);
+  /* 防止水平滚动，但不使用 overflow-x，因为它会破坏 sticky */
+  overflow-x: clip;
 }
 
 .hero {
@@ -52,12 +54,25 @@
   grid-template-columns: 300px 1fr;
   gap: var(--spacing-2xl);
   margin-top: var(--spacing-2xl);
+  align-items: start;
 }
 
+/* 侧边栏使用粘性定位（桌面端） */
 .sidebar {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
+  /* 粘性定位：滚动时保持在屏幕顶部 */
+  position: -webkit-sticky; /* Safari 兼容 */
+  position: sticky;
+  top: var(--spacing-lg); /* 距离屏幕顶部1.5rem，留出呼吸空间 */
+  align-self: flex-start; /* 确保从容器顶部开始 */
+  /* 限制最大高度，防止侧边栏过长时超出视窗 */
+  max-height: calc(100vh - 2 * var(--spacing-lg));
+  /* 如果侧边栏内容过多，允许内部滚动 */
+  overflow-y: auto;
+  /* 添加过渡效果 */
+  transition: box-shadow var(--transition-base);
 }
 
 .sidebarSection {
@@ -152,6 +167,43 @@
   gap: var(--spacing-lg);
 }
 
+/* 查看更多按钮容器 */
+.viewMoreWrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-2xl);
+}
+
+/* 查看更多按钮 */
+.viewMoreButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: var(--color-primary);
+  color: var(--color-bg);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.viewMoreButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(51, 204, 255, 0.4);
+}
+
+.viewMoreButton i {
+  font-size: 1.25rem;
+  transition: transform var(--transition-fast);
+}
+
+.viewMoreButton:hover i {
+  transform: translateX(4px);
+}
+
 .footer {
   text-align: center;
   padding: var(--spacing-2xl) 0;
@@ -171,15 +223,29 @@
 
 @media (max-width: 1024px) {
   .mainContent {
+    /* 移动端改为单列布局 */
     grid-template-columns: 1fr;
+    /* 使用grid确保侧边栏显示在上方 */
+    grid-template-rows: auto 1fr;
   }
 
+  /* 在移动端取消粘性定位，侧边栏显示在顶部 */
   .sidebar {
+    position: static;
     flex-direction: row;
+    /* 确保侧边栏在移动端显示在第一行 */
+    order: -1;
+    max-height: none;
+    overflow-y: visible;
   }
 
   .sidebarSection {
     flex: 1;
+  }
+  
+  .contentArea {
+    /* 内容区域在侧边栏下方 */
+    order: 0;
   }
 }
 
