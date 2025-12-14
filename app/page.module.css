@@ -7,6 +7,8 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: var(--spacing-xl);
+  /* 防止水平滚动，但不使用 overflow-x，因为它会破坏 sticky */
+  overflow-x: clip;
 }
 
 .hero {
@@ -60,9 +62,17 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
+  /* 粘性定位：滚动时保持在屏幕顶部 */
+  position: -webkit-sticky; /* Safari 兼容 */
   position: sticky;
-  top: var(--spacing-xl);
-  align-self: start;
+  top: var(--spacing-lg); /* 距离屏幕顶部1.5rem，留出呼吸空间 */
+  align-self: flex-start; /* 确保从容器顶部开始 */
+  /* 限制最大高度，防止侧边栏过长时超出视窗 */
+  max-height: calc(100vh - 2 * var(--spacing-lg));
+  /* 如果侧边栏内容过多，允许内部滚动 */
+  overflow-y: auto;
+  /* 添加过渡效果 */
+  transition: box-shadow var(--transition-base);
 }
 
 .sidebarSection {
@@ -213,17 +223,29 @@
 
 @media (max-width: 1024px) {
   .mainContent {
+    /* 移动端改为单列布局 */
     grid-template-columns: 1fr;
+    /* 使用grid确保侧边栏显示在上方 */
+    grid-template-rows: auto 1fr;
   }
 
-  /* 在移动端取消粘性定位 */
+  /* 在移动端取消粘性定位，侧边栏显示在顶部 */
   .sidebar {
     position: static;
     flex-direction: row;
+    /* 确保侧边栏在移动端显示在第一行 */
+    order: -1;
+    max-height: none;
+    overflow-y: visible;
   }
 
   .sidebarSection {
     flex: 1;
+  }
+  
+  .contentArea {
+    /* 内容区域在侧边栏下方 */
+    order: 0;
   }
 }
 
