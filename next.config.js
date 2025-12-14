@@ -25,8 +25,8 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
-  // 关闭 Next.js 遥测（也可通过环境变量 NEXT_TELEMETRY_DISABLED 控制）
-  telemetry: false,
+  // 注意：telemetry 配置已在 Next.js 14+ 中移除
+  // 如需禁用遥测，请设置环境变量：NEXT_TELEMETRY_DISABLED=1
 }
 
 module.exports = nextConfig
