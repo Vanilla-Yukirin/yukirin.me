@@ -8,6 +8,11 @@
 import { useEffect, useState } from 'react';
 import styles from './GlobalLoader.module.css';
 
+// 常量配置
+const FADE_OUT_DURATION_MS = 500; // 淡出动画时长（需与 CSS transition 保持一致）
+const MAX_LOADING_TIME_MS = 5000; // 最大加载时间（超时保护）
+const RENDER_STABILIZATION_DELAY_MS = 100; // 渲染稳定等待时间
+
 export default function GlobalLoader() {
   const [loading, setLoading] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
@@ -16,11 +21,14 @@ export default function GlobalLoader() {
     // 检查字体是否加载完成
     const checkFontsLoaded = async () => {
       try {
-        // 等待所有字体加载完成
-        await document.fonts.ready;
+        // 检查浏览器是否支持 Font Loading API
+        if (typeof document !== 'undefined' && 'fonts' in document) {
+          // 等待所有字体加载完成
+          await document.fonts.ready;
+        }
         
         // 额外等待一小段时间确保渲染稳定
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, RENDER_STABILIZATION_DELAY_MS));
         
         // 开始淡出动画
         setFadeOut(true);
@@ -28,14 +36,14 @@ export default function GlobalLoader() {
         // 淡出完成后移除加载器
         setTimeout(() => {
           setLoading(false);
-        }, 500); // 与 CSS transition 时间匹配
+        }, FADE_OUT_DURATION_MS);
       } catch (error) {
         // 如果字体加载失败，也要移除加载器
-        console.error('字体加载检测失败:', error);
+        console.error('Font loading detection failed:', error);
         setFadeOut(true);
         setTimeout(() => {
           setLoading(false);
-        }, 500);
+        }, FADE_OUT_DURATION_MS);
       }
     };
 
@@ -44,8 +52,8 @@ export default function GlobalLoader() {
       setFadeOut(true);
       setTimeout(() => {
         setLoading(false);
-      }, 500);
-    }, 5000); // 5秒后强制移除
+      }, FADE_OUT_DURATION_MS);
+    }, MAX_LOADING_TIME_MS);
 
     checkFontsLoaded();
 
