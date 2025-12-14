@@ -1,264 +1,191 @@
-# yukirin.me
+# Vanilla Yukirin 个人网站
 
-Yukirin 的个人网站
+> 基于 Next.js 14 (App Router) + TypeScript 构建的现代化个人网站
 
-## 特点
+## 🚀 项目特点
 
-- **双页面设计**：主页+简历页
-- **完全响应式布局**：移动端&桌面端适配
-- **侧边栏导航**：快速展示联系方式和个人信息
-- **Markdown支持**：“关于我”部分支持Markdown渲染
-- **项目卡片系统**：灵活展示项目、论文、作品
-- **集成流量统计**：感谢 Arisu 的支持
+- ✅ **Next.js 14 App Router**: 使用最新的 App Router 架构
+- ✅ **TypeScript**: 完整的类型安全支持
+- ✅ **服务端渲染 (SSR/SSG)**: 所有数据在服务端读取，消除客户端 fetch 闪烁
+- ✅ **模块化设计**: 清晰的项目结构，易于维护和扩展
+- ✅ **静态色板**: 统一的颜色管理系统（`lib/colors.ts`）
+- ✅ **API 路由预留**: 为未来功能（登录、数据库、上传）预留接口
+- ✅ **响应式设计**: 完美适配各种设备尺寸
+- ✅ **中文注释**: 所有代码都有完整的中文注释
 
-## 项目结构
+## 📁 项目结构
 
 ```
 yukirin.me/
-├── index.html          # 主页页面
-├── style.css           # 主页样式
-├── script.js           # 主页脚本
-├── data.json           # 数据文件（个人信息、项目列表）
-├── about.md            # “关于我”Markdown 文件
-├── images/             # 图片资源
-│   └── avatar.png      # 头像图片
-├── assets/             # 静态资源
-│   └── fonts/          # 自定义字体
-├── cv-blue/            # 简历页（蓝色主题）
-├── cv-pink/            # 简历页（粉色主题）
-├── favicon.png         # 网站图标
-└── README.md           # README
+├── app/                      # Next.js App Router 目录
+│   ├── api/                 # API 路由
+│   │   └── hello/           # 示例 API
+│   │       └── route.ts     # API 处理函数
+│   ├── cv-pink/             # 粉色简历页
+│   │   └── page.tsx         # 简历页面组件
+│   ├── cv-blue/             # 蓝色简历页
+│   │   └── page.tsx         # 简历页面组件
+│   ├── globals.css          # 全局样式
+│   ├── layout.tsx           # 根布局
+│   └── page.tsx             # 主页
+├── components/              # 可复用组件
+│   ├── BackgroundCanvas.tsx # 背景动画组件
+│   └── ProjectCard.tsx      # 项目卡片组件
+├── data/                    # 数据文件
+│   ├── about.md            # 关于我（Markdown）
+│   ├── data.json           # 主页数据
+│   ├── cv-pink.json        # 粉色简历数据
+│   └── cv-blue.json        # 蓝色简历数据
+├── lib/                     # 工具函数和配置
+│   ├── colors.ts           # 颜色常量配置
+│   ├── data.ts             # 数据加载工具
+│   └── types.ts            # TypeScript 类型定义
+├── public/                  # 静态资源
+│   ├── fonts/              # 本地字体文件
+│   └── images/             # 图片资源
+├── next.config.js          # Next.js 配置
+├── tsconfig.json           # TypeScript 配置
+└── package.json            # 项目依赖
+
 ```
 
-## 快速开始
+## 🛠️ 技术栈
 
-### 本地开发
+- **框架**: Next.js 14 (App Router)
+- **语言**: TypeScript
+- **样式**: CSS Modules
+- **Markdown**: marked
+- **运行时**: Node.js 18+
+- **包管理**: npm
 
-对于 vscode，可以使用Live Server插件；或者使用任意HTTP服务器即可：
+## 📦 安装与运行
+
+### 开发环境
 
 ```bash
-# 使用 Python 3
-python3 -m http.server 8080
+# 安装依赖
+npm install
 
-# 使用 Node.js (http-server)
-npx http-server -p 8080
+# 启动开发服务器
+npm run dev
 
-# 使用 PHP
-php -S localhost:8080
+# 访问 http://localhost:3000
 ```
 
-然后在浏览器中打开：
-- 主页：http://localhost:8080
-- 简历：http://localhost:8080/cv
+### 生产构建
 
-### 部署
+```bash
+# 构建项目
+npm run build
 
-将整个仓库部署到任何静态托管服务：
+# 启动生产服务器
+npm start
+```
 
-- GitHub Pages
+### 代码检查
+
+```bash
+# 运行 ESLint
+npm run lint
+```
+
+## 📝 数据管理
+
+所有数据都存储在 `data/` 目录中，方便管理和更新：
+
+### 主页数据
+
+编辑 `data/data.json` 和 `data/about.md` 来更新主页内容。
+
+### 简历页数据
+
+- 粉色版：编辑 `data/cv-pink.json`
+- 蓝色版：编辑 `data/cv-blue.json`
+
+数据会在服务端读取并渲染，无需重启服务器（开发模式下自动更新）。
+
+## 🎨 颜色配置
+
+所有颜色常量都定义在 `lib/colors.ts` 中：
+
+- `TECH_COLORS`: 主页科技风格色板
+- `PINK_COLORS`: 粉色简历页色板
+- `BLUE_COLORS`: 蓝色简历页色板
+- `TAG_COLOR_PALETTE`: 项目标签色板（10色）
+- `STATUS_COLORS`: 状态色（成功、警告、错误等）
+
+## 🔌 API 路由
+
+API 路由位于 `app/api/` 目录，已预留以下功能接口：
+
+- `/api/hello`: 示例 API（已实现）
+- `/api/auth/*`: 认证接口（待实现）
+- `/api/db/*`: 数据库操作接口（待实现）
+- `/api/upload/*`: 文件上传接口（待实现）
+
+### 使用示例
+
+```typescript
+// GET 请求
+const response = await fetch('/api/hello');
+const data = await response.json();
+
+// POST 请求
+const response = await fetch('/api/hello', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ message: 'Hello!' }),
+});
+```
+
+## 🚀 部署
+
+### Vercel（推荐）
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+
+### 其他平台
+
+项目可以部署到任何支持 Next.js 的平台：
+
 - Netlify
-- Vercel
-- Cloudflare Pages
-- 任何Web服务器 (nginx, Apache等)
+- AWS Amplify
+- Railway
+- 自建服务器
 
-## 📝 自定义配置
+## 📚 文档
 
-### 1. 修改头像和网站图标
+- [开发指南](./DEVELOPMENT.md) - 详细的开发文档
+- [部署指南](./DEPLOYMENT.md) - 部署和运维文档
 
-将你的头像图片放到 `images/avatar.png`，网站图标放到根目录 `favicon.png`。
+## 🔧 扩展功能
 
-`data.json` 会自动引用本地头像：
-```json
-"avatar": "images/avatar.png"
-```
+项目已预留以下功能接口：
 
-### 2. 修改"关于我"内容 ⭐
+- **认证系统**: `app/api/auth/*`
+- **数据库操作**: `app/api/db/*`
+- **文件上传**: `app/api/upload/*`
 
-**直接编辑 `about.md` 文件**，使用 Markdown 语法编写你的自我介绍。
-
-这是一个独立的 Markdown 文件，方便编辑和版本控制。页面会自动加载并渲染该文件。
-
-示例内容：
-```markdown
-我是一名数据科学与大数据技术专业的在读学生...
-
-## 研究方向
-- 深度学习
-- 自然语言处理
-
-## 技能
-- **编程语言**: Python, C++
-- **深度学习**: PyTorch, TensorFlow
-```
-
-支持的 Markdown 特性：
-- 标题（`##`）
-- 列表（`-`、`1.`）
-- 粗体（`**文本**`）、斜体（`*文本*`）
-- 超链接（`[文字](URL)`）会显示为**粉色加粗下划线**
-- 代码块（`` `code` ``）
-
-### 3. 修改个人信息
-
-编辑 `data.json`：
-
-```json
-{
-  "personal": {
-    "name": "你的名字",
-    "subtitle": "你的标签 | 你的专业",
-    "avatar": "images/avatar.png",
-    "info": {
-      "身份": "本科在读",
-      "学校": "某大学",
-      "专业": "某专业",
-      "状态": "持续学习中"
-    }
-  }
-}
-```
-
-### 4. 添加/修改项目卡片
-
-编辑 `data.json` 中的 `projects` 数组：
-
-```json
-{
-  "title": "项目名称",
-  "link": "https://github.com/...",
-  "image": "https://example.com/image.jpg",
-  "imagePosition": "left",
-  "tags": [
-    { "name": "深度学习", "index": 0 },
-    { "name": "PyTorch", "index": 2 }
-  ],
-  "description": "项目详细描述",
-  "comment": "一句话评价"
-}
-```
-
-**属性说明：**
-- `title`: 项目标题
-- `link`: 点击卡片跳转的链接
-- `image`: 项目配图 URL
-- `imagePosition`: 图片位置，`"left"` 或 `"right"`
-- `tags`: 标签数组
-  - `name`: 标签文字
-  - `index`: 颜色索引（0-9），使用预定义的 10 色色板
-- `description`: 项目详细描述
-- `comment`: 补充说明（斜体显示）
-
-**标签颜色索引（0-9）：**
-- 0: 活力青 `#33CCFF`
-- 1: 天空蓝 `#3399FF`
-- 2: 靛青色 `#5C7CFA`
-- 3: 罗兰紫 `#845EF7`
-- 4: 葡萄紫 `#BE4BDB`
-- 5: 甜心粉 `#F06595`
-- 6: 珊瑚红 `#FF6B6B`
-- 7: 青绿色 `#20C997`
-- 8: 湖蓝色 `#3BC9DB`
-- 9: 矢车菊蓝 `#4DABF7`
-
-索引会循环使用，例如 `index: 10` 等价于 `index: 0`。
-
-### 5. 修改联系方式
-
-联系方式已使用 [Remix Icon](https://remixicon.com/)，无需手动编写 SVG。
-
-编辑 `index.html` 中的侧边栏：
-
-```html
-<a href="你的链接" class="contact-item">
-    <i class="ri-github-fill" aria-hidden="true"></i>
-    <span>GitHub</span>
-</a>
-```
-
-常用图标类名：
-- GitHub: `ri-github-fill`
-- Email: `ri-mail-line`
-- 简历: `ri-file-text-line`
-- Twitter: `ri-twitter-fill`
-- LinkedIn: `ri-linkedin-fill`
-
-### 6. 修改配色
-
-#### 主页配色（蓝色系）
-
-编辑 `style.css` 中的 CSS 变量：
-
-```css
-:root {
-    --primary-color: #33ccff;        /* 主色调（青蓝色） */
-    --secondary-color: #66b3ff;      /* 次色调（浅蓝色） */
-    --background: #f0f8ff;           /* 背景色（浅蓝白） */
-    --card-bg: #ffffff;              /* 卡片背景 */
-    --text-primary: #2d2d2d;         /* 主文字颜色 */
-    --text-secondary: #666666;       /* 次文字颜色 */
-    /* ... */
-}
-```
-
-#### 简历页配色
-
-- `cv-blue/`: 蓝色主题
-- `cv-pink/`: 粉色主题
-
-可编辑对应目录下的 `style.css`。
-
-### 7. 自定义字体
-
-项目已配置中英文双字体：
-- **英文**: JetBrains Mono（等宽，适合代码风格）
-- **中文**: Sarasa Mono Slab SC（更纱黑体，等宽）
-
-字体文件位于 `assets/fonts/`，通过 `unicode-range` 自动按字符集分配。
-
-如需更换字体，编辑 `style.css` 的 `@font-face` 规则。
-
-## 🎯 核心特性
-
-### 数据驱动架构
-
-- **数据与代码分离**：个人信息、项目列表存储在 `data.json`
-- **Markdown 独立编辑**：自我介绍写在 `about.md`，支持版本控制
-- **静态色板系统**：10 色预定义色板，标签使用 0-9 索引，无需手写色值
-- **自动字体分配**：中英文通过 `unicode-range` 自动使用不同字体
-
-### 样式系统
-
-- **响应式布局**：移动端&桌面端自适应
-- **等宽字体组合**：标题和标签使用 JetBrains Mono + Sarasa Mono，统一科技感
-- **Remix Icon 集成**：图标使用 CSS 类名，无需内联 SVG
-- **Markdown 渲染**：自动渲染 `about.md`，支持粗体、斜体、列表、链接等
-
-## 🎨 设计说明
-
-### 主页（蓝色系）
-- 浅色背景 + 青蓝色主题
-- 侧边栏布局
-- 项目卡片左右交替展示
-- Markdown 自我介绍区域
-- 统一的等宽字体（标题、标签）
-
-### 简历页（双主题）
-- **cv-blue/**: 蓝色主题
-- **cv-pink/**: 粉色主题
-- 卡片式信息展示
-- 详细的项目和论文信息
-
-### 超链接样式
-- 浅粉色 `#FF8FAB`
-- 加粗 + 下划线
-- hover 时变深粉 `#FF6B9D`
-
-## 🌐 浏览器支持
-
-- 现代浏览器 (Chrome, Firefox, Safari, Edge)
-- 移动浏览器 (iOS Safari, Chrome Mobile)
-- 需要支持ES6+和Canvas API
+可根据需求自行实现。
 
 ## 📄 许可证
 
-个人网站 - 保留所有权利
+ISC License
+
+## 👤 作者
+
+**Vanilla Yukirin**
+
+- GitHub: [@Vanilla-Yukirin](https://github.com/Vanilla-Yukirin)
+- Email: contact@yukirin.me
+
+## 🙏 致谢
+
+- [Next.js](https://nextjs.org/) - React 框架
+- [TypeScript](https://www.typescriptlang.org/) - 类型系统
+- [Marked](https://marked.js.org/) - Markdown 解析器
+- [RemixIcon](https://remixicon.com/) - 图标库
+
+---
+
+© 2025 Vanilla Yukirin · 永远可爱 · 永远善良

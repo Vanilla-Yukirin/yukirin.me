@@ -1,0 +1,74 @@
+{
+  "personal": {
+    "name": "Vanilla Yukirin",
+    "subtitle": "✨ 数据科学 · 深度学习 · 算法竞赛 ✨",
+    "about": [
+      "🎓 27届毕业生 · 大三在读",
+      "🏫 某普通一本大学 · 理学院",
+      "💻 数据科学与大数据技术专业",
+      "🌱 蒟蒻 · 还在学习中"
+    ]
+  },
+  "achievements": [
+    "🥈 ICPC 国际大学生程序设计竞赛区域赛银奖",
+    "🏆 全国大学生数学建模竞赛国家二等奖（2次）",
+    "🥈 浙江省第二十二届大学生程序设计竞赛银奖",
+    "🥇 统计建模竞赛浙江省一等奖（2次）"
+  ],
+  "projects": [
+    {
+      "title": "基于ResViTM的CT图像肺结核识别",
+      "period": "2025.4 - 2025.8",
+      "description": "设计ResViTM融合架构（ResNet+ViT+Meta），在4999份样本上达到96.0%准确率",
+      "tags": ["深度学习", "医学影像", "多模态融合"]
+    },
+    {
+      "title": "基于GA-TextCNN的社交媒体谣言智能检测",
+      "period": "2024.4 - 2024.6",
+      "description": "创新性提出遗传算法-TextCNN混合模型，在中文谣言数据集上达到97.9%准确率",
+      "tags": ["NLP", "遗传算法", "文本分类"]
+    },
+    {
+      "title": "基于注意力机制的化学分子性质预测",
+      "period": "2024.7 - 2024.9",
+      "description": "设计自适应注意力权重网络，使用20万分子数据训练，MSE从978.3降至931.9",
+      "tags": ["注意力机制", "分子预测", "性能优化"]
+    }
+  ],
+  "papers": [
+    {
+      "title": "CViTM-Net: A Hybrid Deep Learning Method for Tuberculosis Detection in CT Images",
+      "author": "第一作者",
+      "venue": "IEEE CISAT 2025"
+    },
+    {
+      "title": "ResViTM-Net: Where Local Features Meet Global Context",
+      "author": "第二作者",
+      "venue": "SCI期刊审稿中"
+    },
+    {
+      "title": "Application of Attention Mechanism-Based Neural Networks in Predicting Chemical Molecular Properties",
+      "author": "第三作者",
+      "venue": "IEEE ICAICE 2024"
+    }
+  ],
+  "skills": {
+    "编程语言": ["Python", "C/C++", "MATLAB"],
+    "深度学习": ["PyTorch", "U-Net", "ResNet", "Transformer", "ViT"],
+    "机器学习": ["随机森林", "t-SNE", "遗传算法"]
+  },
+  "links": [
+    {
+      "icon": "💻",
+      "name": "GitHub",
+      "desc": "开源项目与代码",
+      "url": "https://github.com/Vanilla-Yukirin"
+    },
+    {
+      "icon": "✉️",
+      "name": "Email",
+      "desc": "联系方式",
+      "url": "mailto:contact@yukirin.me"
+    }
+  ]
+}
