@@ -26,6 +26,11 @@ jobs:
             # 3. 强制重置本地代码到远程的 main 分支（解决冲突）
             git reset --hard origin/main
             
+            # 3.5 注入当前提交信息到环境变量（构建时可用）
+            export NEXT_PUBLIC_COMMIT_SHA=$(git rev-parse --short HEAD)
+            export NEXT_PUBLIC_COMMIT_URL="https://github.com/Vanilla-Yukirin/yukirin.me/commit/${NEXT_PUBLIC_COMMIT_SHA}"
+            export NEXT_TELEMETRY_DISABLED=1
+
             # 4. 安装依赖（使用 ci 而不是 install，因为这是 CI/CD 环境）
             npm ci
 

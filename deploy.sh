@@ -30,6 +30,14 @@ echo "📥 更新代码..."
 git fetch --all
 git reset --hard origin/main
 
+# 注入当前构建的 Git 提交信息到环境变量（供 Next.js 使用）
+# 使用 NEXT_PUBLIC_ 前缀以便在客户端渲染可用
+COMMIT_SHA=$(git rev-parse --short HEAD)
+export NEXT_PUBLIC_COMMIT_SHA="$COMMIT_SHA"
+export NEXT_PUBLIC_COMMIT_URL="https://github.com/Vanilla-Yukirin/yukirin.me/commit/$COMMIT_SHA"
+# 可选：关闭 Next.js 遥测
+export NEXT_TELEMETRY_DISABLED=1
+
 # ============================================
 # 安装依赖
 # ============================================

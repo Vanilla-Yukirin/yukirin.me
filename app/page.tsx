@@ -14,6 +14,8 @@ export default async function HomePage() {
   // 服务端获取数据，无需客户端 fetch
   const data = await getHomeData();
   const aboutHtml = await getAboutContent();
+  const commitSha = process.env.NEXT_PUBLIC_COMMIT_SHA || 'unknown';
+  const commitUrl = process.env.NEXT_PUBLIC_COMMIT_URL || `https://github.com/Vanilla-Yukirin/yukirin.me/commit/${commitSha}`;
 
   return (
     <div className={styles.container}>
@@ -98,6 +100,12 @@ export default async function HomePage() {
         {/* 页脚 */}
         <footer className={styles.footer}>
           <p>© 2025 Vanilla Yukirin · 永远可爱 · 永远善良</p>
+          <p className={styles.quote}>
+            当前版本：
+            <a href={commitUrl} target="_blank" rel="noopener noreferrer">
+              {commitSha}
+            </a>
+          </p>
           <p className={styles.quote}>&quot;Stay hungry, stay foolish.&quot;</p>
         </footer>
     </div>
