@@ -9,92 +9,11 @@
   padding: var(--spacing-xl);
 }
 
+/* 主内容区域 - 不显示侧边栏，内容居中 */
 .mainContent {
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: var(--spacing-2xl);
-  margin-top: var(--spacing-2xl);
-  align-items: start;
-}
-
-/* 侧边栏使用粘性定位（桌面端） */
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl);
-  position: sticky;
-  top: var(--spacing-xl);
-  align-self: start;
-}
-
-.sidebarSection {
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-}
-
-.sidebarTitle {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--color-primary);
-  margin-bottom: var(--spacing-md);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.contactLinks {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.contactItem {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  background: var(--color-bg-hover);
-  border-radius: var(--radius-md);
-  color: var(--color-text-primary);
-  transition: all var(--transition-fast);
-}
-
-.contactItem:hover {
-  background: var(--color-primary);
-  transform: translateX(4px);
-}
-
-.contactItem i {
-  font-size: 1.25rem;
-}
-
-.infoList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.infoItem {
-  display: flex;
-  justify-content: space-between;
-  color: var(--color-text-secondary);
-  font-size: 0.875rem;
-}
-
-.infoLabel {
-  font-weight: 600;
-  color: var(--color-text-muted);
-}
-
-.infoValue {
-  color: var(--color-text-primary);
-}
-
-.contentArea {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2xl);
+  max-width: 1000px;
+  margin: var(--spacing-2xl) auto 0;
+  width: 100%;
 }
 
 .section {
@@ -136,30 +55,10 @@
   color: var(--color-text-muted);
 }
 
-/* 平板和移动端响应式设计 */
-@media (max-width: 1024px) {
-  .mainContent {
-    grid-template-columns: 1fr;
-  }
-
-  /* 在移动端取消粘性定位 */
-  .sidebar {
-    position: static;
-    flex-direction: row;
-  }
-
-  .sidebarSection {
-    flex: 1;
-  }
-}
-
+/* 响应式设计 */
 @media (max-width: 768px) {
   .container {
     padding: var(--spacing-md);
-  }
-
-  .sidebar {
-    flex-direction: column;
   }
 
   .section {

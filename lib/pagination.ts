@@ -23,6 +23,30 @@ export interface PaginationData<T> {
 }
 
 /**
+ * 对项目列表进行排序（按sortId降序）
+ * @param projects 项目列表
+ * @returns 排序后的项目列表
+ */
+export function sortProjects(projects: Project[]): Project[] {
+  return [...projects].sort((a, b) => {
+    const sortIdA = a.sortId ?? 0;
+    const sortIdB = b.sortId ?? 0;
+    // 降序排序：sortId大的在前面
+    return sortIdB - sortIdA;
+  });
+}
+
+/**
+ * 获取置顶项目（pin=true的项目）
+ * @param projects 项目列表
+ * @returns 置顶的项目列表（已排序）
+ */
+export function getPinnedProjects(projects: Project[]): Project[] {
+  const pinnedProjects = projects.filter(p => p.pin === true);
+  return sortProjects(pinnedProjects);
+}
+
+/**
  * 对项目列表进行分页
  * @param projects 项目列表
  * @param page 当前页码（从1开始）
@@ -32,8 +56,11 @@ export function paginateProjects(
   projects: Project[],
   page: number
 ): PaginationData<Project> {
+  // 先对项目按sortId降序排序
+  const sortedProjects = sortProjects(projects);
+  
   const currentPage = Math.max(1, Math.floor(page));
-  const totalItems = projects.length;
+  const totalItems = sortedProjects.length;
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
   // 确保页码在有效范围内
@@ -41,7 +68,7 @@ export function paginateProjects(
 
   const startIndex = (validPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const items = projects.slice(startIndex, endIndex);
+  const items = sortedProjects.slice(startIndex, endIndex);
 
   return {
     items,

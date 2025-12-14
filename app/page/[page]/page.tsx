@@ -59,68 +59,25 @@ export default async function PaginatedPage({ params }: PageProps) {
 
   return (
     <div className={styles.container}>
-        {/* 主内容区域 */}
+        {/* 主内容区域 - 不显示侧边栏，给项目列表更多空间 */}
         <div className={styles.mainContent}>
-          {/* 侧边栏 */}
-          <aside className={styles.sidebar}>
-            {/* 联系方式 */}
-            <div className={styles.sidebarSection}>
-              <h3 className={styles.sidebarTitle}>联系方式</h3>
-              <div className={styles.contactLinks}>
-                <a
-                  href="https://github.com/Vanilla-Yukirin"
-                  className={styles.contactItem}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <i className="ri-github-fill" aria-hidden="true"></i>
-                  <span>GitHub</span>
-                </a>
-                <a href="mailto:contact@yukirin.me" className={styles.contactItem}>
-                  <i className="ri-mail-line" aria-hidden="true"></i>
-                  <span>Email</span>
-                </a>
-                <a href="/cv-pink" className={styles.contactItem}>
-                  <i className="ri-file-text-line" aria-hidden="true"></i>
-                  <span>简历 CV</span>
-                </a>
-              </div>
+          {/* 项目/作品卡片区域 */}
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>
+              [ 项目与作品 - 第 {paginationData.currentPage} 页 ]
+            </h2>
+            <div className={styles.cardsGrid}>
+              {paginationData.items.map((project, index) => (
+                <ProjectCard key={index} project={project} />
+              ))}
             </div>
 
-            {/* 个人信息 */}
-            <div className={styles.sidebarSection}>
-              <h3 className={styles.sidebarTitle}>个人信息</h3>
-              <div className={styles.infoList}>
-                {Object.entries(data.personal.info).map(([label, value]) => (
-                  <div key={label} className={styles.infoItem}>
-                    <span className={styles.infoLabel}>{label}:</span>
-                    <span className={styles.infoValue}>{value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </aside>
-
-          {/* 中间内容区 */}
-          <div className={styles.contentArea}>
-            {/* 项目/作品卡片区域 */}
-            <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>
-                [ 项目与作品 - 第 {paginationData.currentPage} 页 ]
-              </h2>
-              <div className={styles.cardsGrid}>
-                {paginationData.items.map((project, index) => (
-                  <ProjectCard key={index} project={project} />
-                ))}
-              </div>
-
-              {/* 分页导航 */}
-              <Pagination
-                currentPage={paginationData.currentPage}
-                totalPages={paginationData.totalPages}
-              />
-            </section>
-          </div>
+            {/* 分页导航 */}
+            <Pagination
+              currentPage={paginationData.currentPage}
+              totalPages={paginationData.totalPages}
+            />
+          </section>
         </div>
 
         {/* 页脚 */}

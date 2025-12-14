@@ -40,7 +40,9 @@
         { "name": "PyTorch", "index": 2 }
       ],
       "description": "基于ResNet+ViT+Meta的CT图像肺结核识别模型，在4999份样本上达到96.0%准确率",
-      "comment": "已发表于IEEE CISAT 2025"
+      "comment": "已发表于IEEE CISAT 2025",
+      "pin": true,
+      "sortId": 100
     },
     {
       "title": "GA-TextCNN",
@@ -53,7 +55,9 @@
         { "name": "文本分类", "index": 5 }
       ],
       "description": "创新性遗传算法-TextCNN混合模型，在中文谣言检测数据集上达到97.9%准确率",
-      "comment": "统计建模竞赛浙江省一等奖"
+      "comment": "统计建模竞赛浙江省一等奖",
+      "pin": true,
+      "sortId": 90
     },
     {
       "title": "分子性质预测",
@@ -66,7 +70,9 @@
         { "name": "性能优化", "index": 8 }
       ],
       "description": "基于自适应注意力机制的化学分子性质预测模型，MSE从978.3降至931.9",
-      "comment": "已发表于IEEE ICAICE 2024"
+      "comment": "已发表于IEEE ICAICE 2024",
+      "pin": true,
+      "sortId": 80
     },
     {
       "title": "个人博客",
@@ -78,7 +84,8 @@
         { "name": "Markdown", "index": 0 }
       ],
       "description": "记录学习笔记、技术心得和项目经验的个人博客",
-      "comment": "持续更新中..."
+      "comment": "持续更新中...",
+      "sortId": 70
     },
     {
       "title": "机器学习工具库",
@@ -91,7 +98,8 @@
         { "name": "Python", "index": 3 }
       ],
       "description": "常用机器学习算法和数据处理工具集合，简化建模流程",
-      "comment": "开源项目"
+      "comment": "开源项目",
+      "sortId": 60
     },
     {
       "title": "数据可视化平台",
@@ -104,7 +112,8 @@
         { "name": "JavaScript", "index": 6 }
       ],
       "description": "交互式数据可视化平台，支持多种图表类型和实时数据更新",
-      "comment": "课程项目"
+      "comment": "课程项目",
+      "sortId": 50
     },
     {
       "title": "算法竞赛题解",
@@ -117,7 +126,8 @@
         { "name": "C++", "index": 9 }
       ],
       "description": "ICPC、Codeforces等算法竞赛题解和模板代码合集",
-      "comment": "持续维护"
+      "comment": "持续维护",
+      "sortId": 40
     },
     {
       "title": "深度学习实验平台",
@@ -130,7 +140,8 @@
         { "name": "PyTorch", "index": 2 }
       ],
       "description": "集成多种深度学习模型的实验平台，支持快速原型开发和对比实验",
-      "comment": "研究工具"
+      "comment": "研究工具",
+      "sortId": 30
     }
   ]
 }

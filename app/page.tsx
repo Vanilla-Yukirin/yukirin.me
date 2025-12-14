@@ -1,18 +1,18 @@
 /**
  * 主页组件
- * 展示个人介绍、项目作品等信息
+ * 展示个人介绍、置顶项目等信息
  */
 
+import Link from 'next/link';
 import { getHomeData, getAboutContent } from '@/lib/data';
-import { paginateProjects } from '@/lib/pagination';
+import { getPinnedProjects } from '@/lib/pagination';
 import { getCommitInfo } from '@/lib/utils';
 import ProjectCard from '@/components/ProjectCard';
-import Pagination from '@/components/Pagination';
 import styles from './page.module.css';
 
 /**
  * 主页组件（服务端渲染）
- * 默认显示第1页
+ * 只展示置顶（pin=true）的项目
  */
 export default async function HomePage() {
   // 服务端获取数据，无需客户端 fetch
@@ -20,8 +20,8 @@ export default async function HomePage() {
   const aboutHtml = await getAboutContent();
   const { commitSha, commitUrl } = getCommitInfo();
 
-  // 分页处理
-  const paginationData = paginateProjects(data.projects, 1);
+  // 获取置顶项目（pin=true的项目，已按sortId降序排序）
+  const pinnedProjects = getPinnedProjects(data.projects);
 
   return (
     <div className={styles.container}>
@@ -91,20 +91,22 @@ export default async function HomePage() {
               />
             </section>
 
-            {/* 项目/作品卡片区域 */}
+            {/* 项目/作品卡片区域 - 仅显示置顶项目 */}
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>[ 项目与作品 ]</h2>
+              <h2 className={styles.sectionTitle}>[ 精选项目 ]</h2>
               <div className={styles.cardsGrid}>
-                {paginationData.items.map((project, index) => (
+                {pinnedProjects.map((project, index) => (
                   <ProjectCard key={index} project={project} />
                 ))}
               </div>
 
-              {/* 分页导航 */}
-              <Pagination
-                currentPage={paginationData.currentPage}
-                totalPages={paginationData.totalPages}
-              />
+              {/* 查看更多按钮 - 跳转到完整项目列表的第1页 */}
+              <div className={styles.viewMoreWrapper}>
+                <Link href="/page/1" className={styles.viewMoreButton}>
+                  <span>查看更多项目</span>
+                  <i className="ri-arrow-right-line"></i>
+                </Link>
+              </div>
             </section>
           </div>
         </div>
