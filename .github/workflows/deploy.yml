@@ -17,6 +17,14 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22000
           script: |
+            # 0. 同步时间（GitHub Actions 时间准确，避免 NTP 不可用问题）
+            # 获取当前 UTC 时间，转换为 CST 并设置到服务器
+            export SYNC_TIME=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+            echo "⏰ 从 GitHub Actions 同步时间: $SYNC_TIME"
+            sudo date -s "$SYNC_TIME"
+            sudo hwclock --systohc --utc
+            echo "✅ 时间同步完成"
+
             # 1. 进入项目目录
             cd /var/www/yukirin.me 
 
