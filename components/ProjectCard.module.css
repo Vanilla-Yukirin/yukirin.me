@@ -70,6 +70,10 @@
 .cardDescription {
   color: var(--color-text-secondary);
   line-height: 1.6;
+  /* 启用 \n 换行符显示 */
+  white-space: pre-wrap;
+  /* 允许长单词换行 */
+  word-break: break-word;
 }
 
 .cardComment {

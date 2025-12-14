@@ -10,7 +10,6 @@
       "状态": "持续学习中"
     }
   },
-  "about": "我是一名数据科学与大数据技术专业的在读学生，对深度学习和算法竞赛充满热情。\n\n### 🏆 竞赛成就\n- **ICPC 区域赛银奖** - 国际大学生程序设计竞赛\n- **数学建模国家二等奖** (2次) - 全国大学生数学建模竞赛\n- **浙江省GPLT银奖** - 第二十二届大学生程序设计竞赛\n- **统计建模浙江省一等奖** (2次)\n\n### 💡 研究方向\n专注于医学影像分析、自然语言处理和深度学习模型优化，致力于将前沿技术应用于实际问题解决。\n\n### 🎯 技能\n**编程语言**: Python, C/C++, MATLAB  \n**深度学习**: PyTorch, TensorFlow  \n**架构**: ResNet, Transformer, ViT, U-Net",
   "links": [
     {
       "name": "GitHub",
@@ -19,11 +18,11 @@
     },
     {
       "name": "Email",
-      "url": "mailto:contact@yukirin.me",
+      "url": "mailto:vanilla_yukirin@outlook.com",
       "icon": "email"
     },
     {
-      "name": "简历 CV",
+      "name": "CV",
       "url": "/cv",
       "icon": "cv"
     }
@@ -31,60 +30,61 @@
   "projects": [
     {
       "title": "ResViTM-Net",
-      "link": "https://github.com/Vanilla-Yukirin",
-      "image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400",
+      "link": "https://github.com/Vanilla-Yukirin/ResViTM-Net",
+      "image": "https://raw.githubusercontent.com/Vanilla-Yukirin/ResViTM-Net/main/model_output/ResViTM-20250804021325.png",
       "imagePosition": "left",
       "tags": [
         { "name": "深度学习", "index": 0 },
         { "name": "医学影像", "index": 1 },
-        { "name": "PyTorch", "index": 2 }
+        { "name": "PyTorch", "index": 2 },
+        { "name": "计算机视觉", "index": 3 }
       ],
-      "description": "基于ResNet+ViT+Meta的CT图像肺结核识别模型，在4999份样本上达到96.0%准确率",
-      "comment": "已发表于IEEE CISAT 2025",
+      "description": "基于 ResNet+ViT+Meta 的 CT 图像肺结核识别模型，在 4999 份样本上达到 96.0% 准确率",
+      "comment": "求求了 Accepted 吧，欧内该瓦达西！",
       "pin": true,
       "sortId": 100
     },
     {
-      "title": "GA-TextCNN",
-      "link": "https://github.com/Vanilla-Yukirin",
-      "image": "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=400",
+      "title": "repo: matlab-math-modeling",
+      "link": "https://github.com/Vanilla-Yukirin/matlab-math-modeling",
+      "image": "https://github.com/Vanilla-Yukirin/matlab-math-modeling/blob/main/figs/Run_code1.png?raw=true",
       "imagePosition": "right",
       "tags": [
-        { "name": "NLP", "index": 3 },
-        { "name": "遗传算法", "index": 4 },
-        { "name": "文本分类", "index": 5 }
+        { "name": "MATLAB", "index": 3 },
+        { "name": "LaTeX", "index": 4 },
+        { "name": "课件", "index": 5 }
       ],
-      "description": "创新性遗传算法-TextCNN混合模型，在中文谣言检测数据集上达到97.9%准确率",
-      "comment": "统计建模竞赛浙江省一等奖",
+      "description": "Matlab 与简单数学模型\n从零开始的数模之旅 🚀",
+      "comment": "很感谢能有这样的一次机会给大家讲课啊……",
       "pin": true,
       "sortId": 90
     },
     {
-      "title": "分子性质预测",
-      "link": "https://github.com/Vanilla-Yukirin",
-      "image": "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400",
+      "title": "基于自适应注意力机制的化学分子性质预测模型",
+      "link": "https://github.com/demodulator1/Attention-Based-Chem-Predictor",
+      "image": "https://github.com/demodulator1/Attention-Based-Chem-Predictor/blob/master/output/Attention_loss_plot.png?raw=true",
       "imagePosition": "left",
       "tags": [
         { "name": "注意力机制", "index": 6 },
         { "name": "分子预测", "index": 7 },
         { "name": "性能优化", "index": 8 }
       ],
-      "description": "基于自适应注意力机制的化学分子性质预测模型，MSE从978.3降至931.9",
-      "comment": "已发表于IEEE ICAICE 2024",
+      "description": "Codebase for the paper \"Application of Attention Mechanism-Based Neural Networks in Predicting Chemical Molecular Properties\"",
+      "comment": "班长带我！",
       "pin": true,
       "sortId": 80
     },
     {
-      "title": "个人博客",
-      "link": "#",
-      "image": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=400",
+      "title": "repo: YOLOv5-Car-Counting-Model",
+      "link": "https://github.com/Vanilla-Yukirin/YOLOv5-Car-Counting-Model",
+      "image": "https://github.com/Vanilla-Yukirin/YOLOv5-Car-Counting-Model/blob/main/workspace/output/00000.png?raw=true",
       "imagePosition": "right",
       "tags": [
         { "name": "技术分享", "index": 9 },
         { "name": "Markdown", "index": 0 }
       ],
-      "description": "记录学习笔记、技术心得和项目经验的个人博客",
-      "comment": "持续更新中...",
+      "description": "数学建模暑期集训第三次个人赛A题代码\n智能视频监控分析与车辆计数模型",
+      "comment": "不重要",
       "sortId": 70
     },
     {

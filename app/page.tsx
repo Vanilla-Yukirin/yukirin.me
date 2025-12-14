@@ -6,7 +6,7 @@
 import Link from 'next/link';
 import { getHomeData, getAboutContent } from '@/lib/data';
 import { getPinnedProjects } from '@/lib/pagination';
-import { getCommitInfo } from '@/lib/utils';
+import { getCommitInfo, getLinkIcon } from '@/lib/utils';
 import ProjectCard from '@/components/ProjectCard';
 import styles from './page.module.css';
 
@@ -46,23 +46,18 @@ export default async function HomePage() {
             <div className={styles.sidebarSection}>
               <h3 className={styles.sidebarTitle}>联系方式</h3>
               <div className={styles.contactLinks}>
-                <a
-                  href="https://github.com/Vanilla-Yukirin"
-                  className={styles.contactItem}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <i className="ri-github-fill" aria-hidden="true"></i>
-                  <span>GitHub</span>
-                </a>
-                <a href="mailto:contact@yukirin.me" className={styles.contactItem}>
-                  <i className="ri-mail-line" aria-hidden="true"></i>
-                  <span>Email</span>
-                </a>
-                <a href="/cv-pink" className={styles.contactItem}>
-                  <i className="ri-file-text-line" aria-hidden="true"></i>
-                  <span>简历 CV</span>
-                </a>
+                {data.links.map((link, index) => (
+                  <a
+                    key={index}
+                    href={link.url}
+                    className={styles.contactItem}
+                    target={link.url.startsWith('http') ? '_blank' : undefined}
+                    rel={link.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  >
+                    <i className={getLinkIcon(link.icon)} aria-hidden="true"></i>
+                    <span>{link.name}</span>
+                  </a>
+                ))}
               </div>
             </div>
 
