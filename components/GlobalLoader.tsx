@@ -12,6 +12,7 @@ import styles from './GlobalLoader.module.css';
 const FADE_OUT_DURATION_MS = 500; // 淡出动画时长（需与 CSS transition 保持一致）
 const MAX_LOADING_TIME_MS = 5000; // 最大加载时间（超时保护）
 const RENDER_STABILIZATION_DELAY_MS = 100; // 渲染稳定等待时间
+const FALLBACK_DELAY_MS = 1000; // 不支持 Font Loading API 时的降级延迟
 
 export default function GlobalLoader() {
   const [loading, setLoading] = useState(true);
@@ -24,6 +25,12 @@ export default function GlobalLoader() {
     // 安全地触发淡出效果
     const triggerFadeOut = () => {
       if (!mounted) return;
+      
+      // 清理之前的 fadeTimeout（如果存在）以防止内存泄漏
+      if (fadeTimeout) {
+        clearTimeout(fadeTimeout);
+      }
+      
       setFadeOut(true);
       fadeTimeout = setTimeout(() => {
         if (mounted) {
@@ -47,7 +54,7 @@ export default function GlobalLoader() {
           triggerFadeOut();
         } else {
           // 不支持 Font Loading API，使用较短的固定延迟后淡出
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, FALLBACK_DELAY_MS));
           triggerFadeOut();
         }
       } catch (error) {
