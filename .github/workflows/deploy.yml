@@ -9,26 +9,33 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH
-        # 使用大家最常用的 appleboy/ssh-action 插件
+      - name: Deploy Next.js App via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22000
-          # 核心脚本逻辑
           script: |
-            # 1. 进入项目目录 (请修改为你服务器上的实际路径)
+            # 1. 进入项目目录
             cd /var/www/yukirin.me 
 
-            # 2. 获取远程最新代码，但不合并
+            # 2. 获取远程最新代码
             git fetch --all
 
-            # 3. 【防冲突核心】强制重置本地代码到远程的 main 分支
-            # 这会丢弃服务器上所有未提交的修改，保证绝无冲突
+            # 3. 强制重置本地代码到远程的 main 分支（解决冲突）
             git reset --hard origin/main
             
-            # 4. (可选) 如果你的项目需要重启服务，可以在这里加命令
-            # 例如：pm2 reload all 或 docker compose restart
-            echo "Deployment successful!"
+            # 4. 安装依赖（使用 ci 而不是 install，因为这是 CI/CD 环境）
+            npm ci
+
+            # 5. 构建 Next.js 应用（生成 .next 目录）
+            npm run build
+
+            # 6. 重启应用（使用 PM2）
+            pm2 restart yukirin-site
+
+            # 7. 保存进程列表
+            pm2 save
+
+            echo "✅ Next.js 部署成功！"
