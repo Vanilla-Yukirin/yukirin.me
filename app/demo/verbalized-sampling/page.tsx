@@ -311,7 +311,6 @@ export default function VerbalizedSamplingPage() {
           </div>
         </section>
       )}
-
       
       {/* 2D可视化 */}
       {result && (

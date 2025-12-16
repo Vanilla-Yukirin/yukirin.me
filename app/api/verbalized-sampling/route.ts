@@ -14,10 +14,10 @@ const emb = new OpenAI({
 });
 
 //统一设置模型
-const llm_model = 'openai/gpt-5-mini';
-const emb_model = 'Qwen/Qwen3-Embedding-0.6B';
+const llmModel = 'openai/gpt-5-mini';
+const embModel = 'Qwen/Qwen3-Embedding-0.6B';
 
-export function parseResponses(text: string): string[] {
+export function parseResponses(text: string, k: number): string[] {
     // 先移除可能的外层 <responses> 标签
     text = text.replace(/<\/?responses>/g, '');
 
@@ -35,7 +35,7 @@ export function parseResponses(text: string): string[] {
     }
 
     // 策略2：如果严格匹配失败，使用超级宽松的解析
-    if (responses.length !== 5) {
+    if (responses.length !== k) {
         console.log('严格匹配失败，启用宽松解析模式');
 
         // 找到所有 <xxx> 标签的位置，作为分隔符
@@ -140,7 +140,7 @@ export async function POST(request: Request) {
         
         //1. 接受用户的问题和参数
         const body = await request.json();
-        const { question, temperature = 1.5, model = llm_model, k = 5 } = body;
+        const { question, temperature = 1.5, model = llmModel, k = 5 } = body;
         
         //2. 验证输入的长度
         if (!question || typeof question !== 'string') {
@@ -176,15 +176,8 @@ export async function POST(request: Request) {
         const stdSystemPrompt = `${stdSystemPromptbase}\n\n${formatInstruction}`;
         const vsSystemPrompt = `${vsSystemPromptbase}\n\n${formatInstruction}`;
 
-
-
-
-
-
-
-
         //4. 调用LLM两次
-        console.log("开始生成标准回答...")
+        console.log("开始生成标准回答...");
         const stdCompletion = await llm.chat.completions.create({
           model: model,  // 使用前端传入的模型
           messages: [
@@ -196,7 +189,7 @@ export async function POST(request: Request) {
           enable_thinking: false,
         } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
 
-        console.log("开始生成Verbalized Sampling回答...")
+        console.log("开始生成Verbalized Sampling回答...");
         const vsCompletion = await llm.chat.completions.create({
           model: model,  // 使用前端传入的模型
           messages: [
@@ -218,8 +211,8 @@ export async function POST(request: Request) {
         console.log("=== Verbalized Sampling 返回的原始文本 ====");
         console.log(vsText);
 
-        const stdResponses = parseResponses(stdText);
-        const vsResponses = parseResponses(vsText);
+        const stdResponses = parseResponses(stdText, k);
+        const vsResponses = parseResponses(vsText, k);
 
         console.log('标准方法解析到的回答数量:', stdResponses.length);
         console.log('VS方法解析到的回答数量:', vsResponses.length);
@@ -241,12 +234,12 @@ export async function POST(request: Request) {
         const stdResponsesSliced = stdResponses.slice(0, k);
         const vsResponsesSliced = vsResponses.slice(0, k);
 
-        //6. 获取embmbedding
+        //6. 获取embedding
         const allResponses = [...stdResponsesSliced, ...vsResponsesSliced]; //合并两个数组（只用前k个）
 
-        console.log("开始生成Embedding...")
+        console.log("开始生成Embedding...");
         const embeddingResponse = await emb.embeddings.create({
-          model: emb_model,
+          model: embModel,
           input: allResponses,
         });
 
