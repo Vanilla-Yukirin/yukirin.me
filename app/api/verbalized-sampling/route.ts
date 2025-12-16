@@ -227,7 +227,7 @@ export async function POST(request: Request) {
         if (stdResponses.length < k || vsResponses.length < k) {
             return NextResponse.json(
                 {
-                    error: `LLM 返回的答案数量不足${k}个，请尝试降低 Temperature 值后重试`,
+                    error: `LLM 返回的答案数量不足${k}个，请尝试降低 Temperature 值或切换模型后重试`,
                     stdCount: stdResponses.length,
                     vsCount: vsResponses.length,
                     stdResponses,
@@ -332,6 +332,10 @@ export async function POST(request: Request) {
             vsResponses: vsResponsesSliced,    // 只返回用于计算的前k个
             rawStdText: stdText,               // 标准方法的原始响应
             rawVsText: vsText,                 // VS方法的原始响应
+            prompts: {
+                stdSystemPrompt: stdSystemPrompt,  // 标准方法的完整系统提示词
+                vsSystemPrompt: vsSystemPrompt,    // VS方法的完整系统提示词
+            },
             distances: {
                 stdIntra: stdIntraDistance,      //标准方法的内部距离
                 vsIntra: vsIntraDistance,        //VS的内部距离

@@ -11,6 +11,10 @@ interface ApiResponse {
   vsResponses: string[];
   rawStdText: string;
   rawVsText: string;
+  prompts: {
+    stdSystemPrompt: string;
+    vsSystemPrompt: string;
+  };
   distances: {
     stdIntra: number;
     vsIntra: number;
@@ -80,8 +84,13 @@ export default function VerbalizedSamplingPage() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Verbalized Sampling 实验</h1>
-
+      <h1 className={styles.title}>一句 Prompt，让大模型不再千篇一律</h1>
+      <p className={styles.paperTitle}>
+        基于论文《Verbalized Sampling: How to Mitigate Mode Collapse and Unlock LLM Diversity》
+      </p>
+      <p className={styles.subtitle}>
+        通过简单的提示词修改，让 LLM 从分布尾部采样，显著提升回答多样性
+      </p>
       {/* 输入区域 */}
       <section className={styles.inputSection}>
         <div className={styles.inputGroup}>
@@ -173,15 +182,13 @@ export default function VerbalizedSamplingPage() {
             <div className={styles.gridItem}>
               <h3 className={styles.subtitle}>标准方法</h3>
               <pre className={styles.code}>
-                你是一个乐于助人的助手。对于每一个提问，请生成一组共五个可能的回答...
-                请从 [完整分布] 中进行随机采样。
+                {result.prompts.stdSystemPrompt}
               </pre>
             </div>
             <div className={styles.gridItem}>
               <h3 className={styles.subtitle}>Verbalized Sampling</h3>
               <pre className={styles.code}>
-                你是一个乐于助人的助手。对于每一个提问，请生成一组共五个可能的回答...
-                请从 [分布的尾部，即每个回答的概率需小于 0.10] 中进行随机采样。
+                {result.prompts.vsSystemPrompt}
               </pre>
             </div>
           </div>

@@ -8,8 +8,24 @@
 .title {
   text-align: center;
   font-size: 2rem;
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
   color: #1f2937;
+}
+
+.paperTitle {
+  text-align: center;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.container > .subtitle {
+  text-align: center;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  color: #4b5563;
+  line-height: 1.6;
 }
 
 /* 输入区域 */
