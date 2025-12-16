@@ -15,6 +15,8 @@ jobs:
         env:
           SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
           SILICONFLOW_BASE_URL: ${{ secrets.SILICONFLOW_BASE_URL }}
+          SHENGSUAN_API_KEY: ${{ secrets.SHENGSUAN_API_KEY }}
+          SHENGSUAN_BASE_URL: ${{ secrets.SHENGSUAN_BASE_URL }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
@@ -57,6 +59,9 @@ jobs:
             # SILCONFLOW
             echo "SILICONFLOW_API_KEY=$SILICONFLOW_API_KEY" >> .env.production
             echo "SILICONFLOW_BASE_URL=$SILICONFLOW_BASE_URL" >> .env.production
+            # SHENGSUAN
+            echo "SHENGSUAN_API_KEY=$SHENGSUAN_API_KEY" >> .env.production
+            echo "SHENGSUAN_BASE_URL=$SHENGSUAN_BASE_URL" >> .env.production
             # Git Commit Info
             COMMIT_SHA=$(git rev-parse --short HEAD)
             echo "NEXT_PUBLIC_COMMIT_SHA=$COMMIT_SHA" >> .env.production
