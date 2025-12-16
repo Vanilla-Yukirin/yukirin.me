@@ -35,6 +35,15 @@ interface ApiResponse {
   };
 }
 
+// 新增：分步状态接口
+interface StepStatus {
+  prompts: boolean;
+  stdComplete: boolean;
+  vsComplete: boolean;
+  embeddingComplete: boolean;
+  metricsComplete: boolean;
+}
+
 export default function VerbalizedSamplingPage() {
   const [question, setQuestion] = useState('');
   const [temperature, setTemperature] = useState(CONFIG.DEFAULT_TEMPERATURE);
@@ -43,6 +52,16 @@ export default function VerbalizedSamplingPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ApiResponse | null>(null);
   const [error, setError] = useState('');
+  
+  // 新增：分步状态
+  const [stepStatus, setStepStatus] = useState<StepStatus>({
+    prompts: false,
+    stdComplete: false,
+    vsComplete: false,
+    embeddingComplete: false,
+    metricsComplete: false,
+  });
+  const [loadingStep, setLoadingStep] = useState<string>('');
 
   const handleSubmit = async () => {
     if (!question.trim()) {
@@ -53,6 +72,14 @@ export default function VerbalizedSamplingPage() {
     setLoading(true);
     setError('');
     setResult(null);
+    setStepStatus({
+      prompts: false,
+      stdComplete: false,
+      vsComplete: false,
+      embeddingComplete: false,
+      metricsComplete: false,
+    });
+    setLoadingStep('正在初始化...');
 
     try {
       const response = await fetch('/api/verbalized-sampling', {
@@ -61,17 +88,94 @@ export default function VerbalizedSamplingPage() {
         body: JSON.stringify({ question, temperature, model, k }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.error || '请求失败');
+        throw new Error('请求失败');
       }
 
-      setResult(data);
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        throw new Error('无法读取响应流');
+      }
+
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        
+        // 保留最后一行（可能不完整）
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const jsonStr = line.slice(6);
+            try {
+              const { step, data } = JSON.parse(jsonStr);
+
+              switch (step) {
+                case 'prompts':
+                  setStepStatus(prev => ({ ...prev, prompts: true }));
+                  setResult(prev => prev ? { ...prev, prompts: data } : null);
+                  setLoadingStep('正在生成标准方法回答...');
+                  break;
+
+                case 'std_complete':
+                  setStepStatus(prev => ({ ...prev, stdComplete: true }));
+                  setResult(prev => ({
+                    ...prev!,
+                    stdResponses: data.responses,
+                    rawStdText: data.rawText,
+                  }));
+                  setLoadingStep('正在生成 Verbalized Sampling 回答...');
+                  break;
+
+                case 'vs_complete':
+                  setStepStatus(prev => ({ ...prev, vsComplete: true }));
+                  setResult(prev => ({
+                    ...prev!,
+                    vsResponses: data.responses,
+                    rawVsText: data.rawText,
+                  }));
+                  setLoadingStep('正在计算 Embedding...');
+                  break;
+
+                case 'embedding_complete':
+                  setStepStatus(prev => ({ ...prev, embeddingComplete: true }));
+                  setLoadingStep('正在计算多样性指标...');
+                  break;
+
+                case 'metrics_complete':
+                  setStepStatus(prev => ({ ...prev, metricsComplete: true }));
+                  setResult(prev => ({
+                    ...prev!,
+                    question: data.question,
+                    k: data.k,
+                    distances: data.distances,
+                    visualization: data.visualization,
+                  }));
+                  setLoadingStep('');
+                  break;
+
+                case 'error':
+                  throw new Error(data.message || '处理失败');
+              }
+            } catch (parseError) {
+              console.error('解析流数据失败:', parseError);
+            }
+          }
+        }
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);
+      setLoadingStep('');
     }
   };
 
@@ -172,10 +276,18 @@ export default function VerbalizedSamplingPage() {
         </button>
 
         {error && <div className={styles.error}>{error}</div>}
+        
+        {/* 加载进度指示器 */}
+        {loading && loadingStep && (
+          <div className={styles.loadingIndicator}>
+            <div className={styles.spinner}></div>
+            <span>{loadingStep}</span>
+          </div>
+        )}
       </section>
 
       {/* 提示词对比 */}
-      {result && (
+      {result && result.prompts && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>系统提示词对比</h2>
           <div className={styles.grid}>
@@ -196,57 +308,85 @@ export default function VerbalizedSamplingPage() {
       )}
 
       {/* 原始响应 */}
-      {result && (
+      {result && (stepStatus.stdComplete || stepStatus.vsComplete) && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>原始响应</h2>
           <div className={styles.grid}>
             <div className={styles.gridItem}>
               <h3 className={styles.subtitle}>标准方法</h3>
-              <pre className={styles.rawResponse}>{result.rawStdText}</pre>
+              {stepStatus.stdComplete ? (
+                <pre className={styles.rawResponse}>{result.rawStdText}</pre>
+              ) : (
+                <div className={styles.loadingPlaceholder}>
+                  <div className={styles.spinner}></div>
+                  <span>正在生成...</span>
+                </div>
+              )}
             </div>
             <div className={styles.gridItem}>
               <h3 className={styles.subtitle}>Verbalized Sampling</h3>
-              <pre className={styles.rawResponse}>{result.rawVsText}</pre>
+              {stepStatus.vsComplete ? (
+                <pre className={styles.rawResponse}>{result.rawVsText}</pre>
+              ) : (
+                <div className={styles.loadingPlaceholder}>
+                  <div className={styles.spinner}></div>
+                  <span>正在生成...</span>
+                </div>
+              )}
             </div>
           </div>
         </section>
       )}
 
       {/* 提取后的回答列表 */}
-      {result && (
+      {result && (stepStatus.stdComplete || stepStatus.vsComplete) && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>提取的回答</h2>
           <div className={styles.grid}>
             <div className={styles.gridItem}>
               <h3 className={styles.subtitle}>
-                标准方法 ({result.stdResponses.length} 个回答)
+                标准方法 {stepStatus.stdComplete && result.stdResponses && `(${result.stdResponses.length} 个回答)`}
               </h3>
-              <ol className={styles.list}>
-                {result.stdResponses.map((resp, idx) => (
-                  <li key={idx} className={styles.listItem}>
-                    {resp}
-                  </li>
-                ))}
-              </ol>
+              {stepStatus.stdComplete && result.stdResponses ? (
+                <ol className={styles.list}>
+                  {result.stdResponses.map((resp, idx) => (
+                    <li key={idx} className={styles.listItem}>
+                      {resp}
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <div className={styles.loadingPlaceholder}>
+                  <div className={styles.spinner}></div>
+                  <span>正在生成...</span>
+                </div>
+              )}
             </div>
             <div className={styles.gridItem}>
               <h3 className={styles.subtitle}>
-                Verbalized Sampling ({result.vsResponses.length} 个回答)
+                Verbalized Sampling {stepStatus.vsComplete && result.vsResponses && `(${result.vsResponses.length} 个回答)`}
               </h3>
-              <ol className={styles.list}>
-                {result.vsResponses.map((resp, idx) => (
-                  <li key={idx} className={styles.listItem}>
-                    {resp}
-                  </li>
-                ))}
-              </ol>
+              {stepStatus.vsComplete && result.vsResponses ? (
+                <ol className={styles.list}>
+                  {result.vsResponses.map((resp, idx) => (
+                    <li key={idx} className={styles.listItem}>
+                      {resp}
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <div className={styles.loadingPlaceholder}>
+                  <div className={styles.spinner}></div>
+                  <span>正在生成...</span>
+                </div>
+              )}
             </div>
           </div>
         </section>
       )}
 
       {/* 指标数据 */}
-      {result && (
+      {result && stepStatus.metricsComplete && result.distances && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>多样性指标</h2>
           <div className={styles.metricsLayout}>
@@ -313,7 +453,7 @@ export default function VerbalizedSamplingPage() {
       )}
       
       {/* 2D可视化 */}
-      {result && (
+      {result && stepStatus.metricsComplete && result.visualization && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>PCA 降维可视化 (2D)</h2>
           <div className={styles.visualization}>

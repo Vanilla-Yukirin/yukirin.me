@@ -2,16 +2,29 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { PCA } from 'ml-pca';
 
-//初始化 llm & emb客户端
-const llm = new OpenAI({
-  apiKey: process.env.SHENGSUAN_API_KEY,
-  baseURL: process.env.SHENGSUAN_BASE_URL,
-});
+//初始化 llm & emb客户端（延迟初始化以避免构建时错误）
+let llm: OpenAI | null = null;
+let emb: OpenAI | null = null;
 
-const emb = new OpenAI({
-  apiKey: process.env.SILICONFLOW_API_KEY,
-  baseURL: process.env.SILICONFLOW_BASE_URL,
-});
+function getLLMClient() {
+  if (!llm) {
+    llm = new OpenAI({
+      apiKey: process.env.SHENGSUAN_API_KEY,
+      baseURL: process.env.SHENGSUAN_BASE_URL,
+    });
+  }
+  return llm;
+}
+
+function getEmbClient() {
+  if (!emb) {
+    emb = new OpenAI({
+      apiKey: process.env.SILICONFLOW_API_KEY,
+      baseURL: process.env.SILICONFLOW_BASE_URL,
+    });
+  }
+  return emb;
+}
 
 //统一设置模型
 const llmModel = 'openai/gpt-5-mini';
@@ -133,7 +146,7 @@ function median(arr: number[]): number {
     }
 }
 
-//POST 请求处理函数
+//POST 请求处理函数（流式响应版本）
 export async function POST(request: Request) {
     try {
         //这里写后续的步骤
@@ -160,11 +173,22 @@ export async function POST(request: Request) {
 
         // 防御性编程
         const sanitizedQuestion = question.trim().slice(0, 50);
-        
-        //3. 构造2种提示词
-        const stdSystemPromptbase = `你是一个乐于助人的助手。对于每一个提问，请生成一组共${k}个可能的回答，每个回答需包含在一个单独的 <response> 标签内。每个回答都应包含一个 <text> 和一个数值 <probability>。请从 [完整分布] 中进行随机采样。`;
-        const vsSystemPromptbase = `你是一个乐于助人的助手。对于每一个提问，请生成一组共${k}个可能的回答，每个回答需包含在一个单独的 <response> 标签内。每个回答都应包含一个 <text> 和一个数值 <probability>。请从 [分布的尾部，即每个回答的概率需小于 0.10] 中进行随机采样。`;
-        const formatInstruction = `重要格式要求：
+
+        // 创建流式响应
+        const encoder = new TextEncoder();
+        const stream = new ReadableStream({
+            async start(controller) {
+                try {
+                    // 辅助函数：发送事件
+                    const sendEvent = (step: string, data: any) => {
+                        const message = `data: ${JSON.stringify({ step, data })}\n\n`;
+                        controller.enqueue(encoder.encode(message));
+                    };
+                    
+                    //3. 构造2种提示词
+                    const stdSystemPromptbase = `你是一个乐于助人的助手。对于每一个提问，请生成一组共${k}个可能的回答，每个回答需包含在一个单独的 <response> 标签内。每个回答都应包含一个 <text> 和一个数值 <probability>。请从 [完整分布] 中进行随机采样。`;
+                    const vsSystemPromptbase = `你是一个乐于助人的助手。对于每一个提问，请生成一组共${k}个可能的回答，每个回答需包含在一个单独的 <response> 标签内。每个回答都应包含一个 <text> 和一个数值 <probability>。请从 [分布的尾部，即每个回答的概率需小于 0.10] 中进行随机采样。`;
+                    const formatInstruction = `重要格式要求：
 1. 每个回答必须严格按照以下格式输出，标签之间不要有空行或换行：
 <response><text>你的回答内容</text><probability>X.XX</probability></response>
 2. 不要添加任何其他标签（如 <responses>、<title>、<reason> 等）
@@ -172,181 +196,212 @@ export async function POST(request: Request) {
 4. 必须生成恰好${k}个完整的 <response> 标签
 5. probability 的值应该在 0.00 到 1.00 之间
 请立即生成${k}个回答，不要包含任何额外的文字说明。`;
-        // 将格式要求附加到提示词中
-        const stdSystemPrompt = `${stdSystemPromptbase}\n\n${formatInstruction}`;
-        const vsSystemPrompt = `${vsSystemPromptbase}\n\n${formatInstruction}`;
+                    // 将格式要求附加到提示词中
+                    const stdSystemPrompt = `${stdSystemPromptbase}\n\n${formatInstruction}`;
+                    const vsSystemPrompt = `${vsSystemPromptbase}\n\n${formatInstruction}`;
 
-        //4. 调用LLM两次
-        console.log("开始生成标准回答...");
-        const stdCompletion = await llm.chat.completions.create({
-          model: model,  // 使用前端传入的模型
-          messages: [
-            { role: 'system', content: stdSystemPrompt },
-            { role: 'user', content: sanitizedQuestion }
-          ],
-          temperature: temperature,  // 使用前端传入的温度
-          max_tokens: 4096,
-          enable_thinking: false,
-        } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
+                    // 发送提示词信息
+                    sendEvent('prompts', {
+                        stdSystemPrompt,
+                        vsSystemPrompt,
+                    });
 
-        console.log("开始生成Verbalized Sampling回答...");
-        const vsCompletion = await llm.chat.completions.create({
-          model: model,  // 使用前端传入的模型
-          messages: [
-            { role: 'system', content: vsSystemPrompt },
-            { role: 'user', content: sanitizedQuestion }
-          ],
-          temperature: temperature,  // 使用前端传入的温度
-          max_tokens: 4096,
-          enable_thinking: false,
-        } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
+                    //4. 调用LLM - 标准方法
+                    console.log("开始生成标准回答...");
+                    const llmClient = getLLMClient();
+                    const stdCompletion = await llmClient.chat.completions.create({
+                        model: model,
+                        messages: [
+                            { role: 'system', content: stdSystemPrompt },
+                            { role: 'user', content: sanitizedQuestion }
+                        ],
+                        temperature: temperature,
+                        max_tokens: 4096,
+                        enable_thinking: false,
+                    } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
 
-        //5. 解析返回的结果
-        const stdText = stdCompletion.choices[0]?.message?.content || '';
-        const vsText = vsCompletion.choices[0]?.message?.content || '';
+                    const stdText = stdCompletion.choices[0]?.message?.content || '';
+                    console.log("=== 标准方法返回的原始文本 ====");
+                    console.log(stdText);
 
-        // debug: 输出 LLM 原始返回内容
-        console.log("=== 标准方法返回的原始文本 ====");
-        console.log(stdText);
-        console.log("=== Verbalized Sampling 返回的原始文本 ====");
-        console.log(vsText);
+                    const stdResponses = parseResponses(stdText, k);
+                    console.log('标准方法解析到的回答数量:', stdResponses.length);
 
-        const stdResponses = parseResponses(stdText, k);
-        const vsResponses = parseResponses(vsText, k);
+                    if (stdResponses.length < k) {
+                        sendEvent('error', {
+                            message: `标准方法返回的答案数量不足${k}个，请尝试降低 Temperature 值或切换模型后重试`,
+                            stdCount: stdResponses.length,
+                        });
+                        controller.close();
+                        return;
+                    }
 
-        console.log('标准方法解析到的回答数量:', stdResponses.length);
-        console.log('VS方法解析到的回答数量:', vsResponses.length);
+                    const stdResponsesSliced = stdResponses.slice(0, k);
 
-        if (stdResponses.length < k || vsResponses.length < k) {
-            return NextResponse.json(
-                {
-                    error: `LLM 返回的答案数量不足${k}个，请尝试降低 Temperature 值或切换模型后重试`,
-                    stdCount: stdResponses.length,
-                    vsCount: vsResponses.length,
-                    stdResponses,
-                    vsResponses
-                },
-                { status: 500 }
-            );
-        }
+                    // 发送标准方法完成事件
+                    sendEvent('std_complete', {
+                        responses: stdResponsesSliced,
+                        rawText: stdText,
+                    });
 
-        // 只取前k个用于计算
-        const stdResponsesSliced = stdResponses.slice(0, k);
-        const vsResponsesSliced = vsResponses.slice(0, k);
+                    //5. 调用LLM - VS方法
+                    console.log("开始生成Verbalized Sampling回答...");
+                    const vsCompletion = await llmClient.chat.completions.create({
+                        model: model,
+                        messages: [
+                            { role: 'system', content: vsSystemPrompt },
+                            { role: 'user', content: sanitizedQuestion }
+                        ],
+                        temperature: temperature,
+                        max_tokens: 4096,
+                        enable_thinking: false,
+                    } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
 
-        //6. 获取embedding
-        const allResponses = [...stdResponsesSliced, ...vsResponsesSliced]; //合并两个数组（只用前k个）
+                    const vsText = vsCompletion.choices[0]?.message?.content || '';
+                    console.log("=== Verbalized Sampling 返回的原始文本 ====");
+                    console.log(vsText);
 
-        console.log("开始生成Embedding...");
-        const embeddingResponse = await emb.embeddings.create({
-          model: embModel,
-          input: allResponses,
+                    const vsResponses = parseResponses(vsText, k);
+                    console.log('VS方法解析到的回答数量:', vsResponses.length);
+
+                    if (vsResponses.length < k) {
+                        sendEvent('error', {
+                            message: `VS方法返回的答案数量不足${k}个，请尝试降低 Temperature 值或切换模型后重试`,
+                            vsCount: vsResponses.length,
+                        });
+                        controller.close();
+                        return;
+                    }
+
+                    const vsResponsesSliced = vsResponses.slice(0, k);
+
+                    // 发送VS方法完成事件
+                    sendEvent('vs_complete', {
+                        responses: vsResponsesSliced,
+                        rawText: vsText,
+                    });
+
+                    //6. 获取embedding
+                    const allResponses = [...stdResponsesSliced, ...vsResponsesSliced];
+
+                    console.log("开始生成Embedding...");
+                    const embClient = getEmbClient();
+                    const embeddingResponse = await embClient.embeddings.create({
+                        model: embModel,
+                        input: allResponses,
+                    });
+
+                    const embeddings = embeddingResponse.data.map(item => item.embedding);
+
+                    // 发送embedding完成事件
+                    sendEvent('embedding_complete', {
+                        message: 'Embedding计算完成',
+                    });
+
+                    //7. 计算余弦距离（相似度）
+                    const stdEmbeddings = embeddings.slice(0, k);
+                    const verbalizedEmbeddings = embeddings.slice(k, k * 2);
+
+                    const stdIntraDis: number[] = [];
+                    for (let i = 0; i < stdEmbeddings.length; i++) {
+                        for (let j = i + 1; j < stdEmbeddings.length; j++) {
+                            stdIntraDis.push(
+                                cosineDistance(stdEmbeddings[i], stdEmbeddings[j])
+                            );
+                        }
+                    }
+
+                    const vsIntraDis: number[] = [];
+                    for (let i = 0; i < verbalizedEmbeddings.length; i++) {
+                        for (let j = i + 1; j < verbalizedEmbeddings.length; j++) {
+                            vsIntraDis.push(
+                                cosineDistance(verbalizedEmbeddings[i], verbalizedEmbeddings[j])
+                            );
+                        }
+                    }
+
+                    const interDis: number[] = [];
+                    for (let i = 0; i < stdEmbeddings.length; i++) {
+                        for (let j = 0; j < verbalizedEmbeddings.length; j++) {
+                            interDis.push(
+                                cosineDistance(stdEmbeddings[i], verbalizedEmbeddings[j])
+                            );
+                        }
+                    }
+
+                    //8. 计算指标
+                    const stdIntraDistance = average(stdIntraDis);
+                    const vsIntraDistance = average(vsIntraDis);
+                    const interDistance = average(interDis);
+                    const stdCentroid = calcCentroid(stdEmbeddings);
+                    const vsCentroid = calcCentroid(verbalizedEmbeddings);
+                    const centroidDistance = cosineDistance(stdCentroid, vsCentroid);
+
+                    //9. PCA降维
+                    const pca = new PCA(embeddings);
+                    const embedding2D = pca.predict(embeddings, { nComponents: 2 }).to2DArray();
+                    const embedding3D = pca.predict(embeddings, { nComponents: 3 }).to2DArray();
+
+                    //10. 计算2D空间中的质心和中位半径
+                    const std2DPoints = embedding2D.slice(0, k);
+                    const vs2DPoints = embedding2D.slice(k, k * 2);
+
+                    const std2DCentroidX = std2DPoints.reduce((sum, p) => sum + p[0], 0) / std2DPoints.length;
+                    const std2DCentroidY = std2DPoints.reduce((sum, p) => sum + p[1], 0) / std2DPoints.length;
+
+                    const vs2DCentroidX = vs2DPoints.reduce((sum, p) => sum + p[0], 0) / vs2DPoints.length;
+                    const vs2DCentroidY = vs2DPoints.reduce((sum, p) => sum + p[1], 0) / vs2DPoints.length;
+
+                    const std2DDistances = std2DPoints.map(p =>
+                        Math.sqrt(Math.pow(p[0] - std2DCentroidX, 2) + Math.pow(p[1] - std2DCentroidY, 2))
+                    );
+                    const std2DMedRadius = median(std2DDistances);
+
+                    const vs2DDistances = vs2DPoints.map(p =>
+                        Math.sqrt(Math.pow(p[0] - vs2DCentroidX, 2) + Math.pow(p[1] - vs2DCentroidY, 2))
+                    );
+                    const vs2DMedRadius = median(vs2DDistances);
+
+                    //11. 发送最终的指标和可视化数据
+                    sendEvent('metrics_complete', {
+                        question: sanitizedQuestion,
+                        k: k,
+                        distances: {
+                            stdIntra: stdIntraDistance,
+                            vsIntra: vsIntraDistance,
+                            inter: interDistance,
+                            centroidShift: centroidDistance,
+                        },
+                        visualization: {
+                            embedding2D,
+                            embedding3D,
+                            centroids2D: {
+                                std: [std2DCentroidX, std2DCentroidY],
+                                vs: [vs2DCentroidX, vs2DCentroidY],
+                            },
+                            avgRadius2D: {
+                                std: std2DMedRadius,
+                                vs: vs2DMedRadius,
+                            },
+                        },
+                    });
+
+                    // 关闭流
+                    controller.close();
+                } catch (error) {
+                    console.log('Stream Error:', error);
+                    const errorMessage = `data: ${JSON.stringify({ step: 'error', data: { message: '服务器内部错误' } })}\n\n`;
+                    controller.enqueue(encoder.encode(errorMessage));
+                    controller.close();
+                }
+            },
         });
 
-        const embeddings = embeddingResponse.data.map(item => item.embedding);
-
-        //7. 计算余弦距离（相似度）
-        const stdEmbeddings = embeddings.slice(0, k);
-        const verbalizedEmbeddings = embeddings.slice(k, k * 2);
-
-        const stdIntraDis: number[] = [];
-        for (let i = 0; i < stdEmbeddings.length; i++) {
-            for (let j = i + 1; j < stdEmbeddings.length; j++) {
-                stdIntraDis.push(
-                    cosineDistance(stdEmbeddings[i], stdEmbeddings[j])
-                );
-            }
-        }
-
-        const vsIntraDis: number[] = [];
-        for (let i = 0; i < verbalizedEmbeddings.length; i++) {
-            for (let j = i + 1; j < verbalizedEmbeddings.length; j++) {
-                vsIntraDis.push(
-                    cosineDistance(verbalizedEmbeddings[i], verbalizedEmbeddings[j])
-                );
-            }
-        }
-
-        const interDis: number[] = [];
-        for (let i = 0; i < stdEmbeddings.length; i++) {
-            for (let j = 0; j < verbalizedEmbeddings.length; j++) {
-                interDis.push(
-                    cosineDistance(stdEmbeddings[i], verbalizedEmbeddings[j])
-                );
-            }
-        }
-
-        //8. 计算指标
-        //内部距离
-        const stdIntraDistance = average(stdIntraDis);
-        const vsIntraDistance = average(vsIntraDis);
-        //类间距离
-        const interDistance = average(interDis);
-        //质心距离
-        const stdCentroid = calcCentroid(stdEmbeddings);
-        const vsCentroid = calcCentroid(verbalizedEmbeddings);
-        const centroidDistance = cosineDistance(stdCentroid, vsCentroid);
-
-        //9. PCA降维
-        const pca = new PCA(embeddings);
-        const embedding2D = pca.predict(embeddings, { nComponents: 2 }).to2DArray();
-        const embedding3D = pca.predict(embeddings, { nComponents: 3 }).to2DArray();
-
-        //10. 计算2D空间中的质心和中位半径
-        // 标准方法的2D点
-        const std2DPoints = embedding2D.slice(0, k);
-        // VS方法的2D点
-        const vs2DPoints = embedding2D.slice(k, k * 2);
-
-        // 计算标准方法的2D质心
-        const std2DCentroidX = std2DPoints.reduce((sum, p) => sum + p[0], 0) / std2DPoints.length;
-        const std2DCentroidY = std2DPoints.reduce((sum, p) => sum + p[1], 0) / std2DPoints.length;
-
-        // 计算VS方法的2D质心
-        const vs2DCentroidX = vs2DPoints.reduce((sum, p) => sum + p[0], 0) / vs2DPoints.length;
-        const vs2DCentroidY = vs2DPoints.reduce((sum, p) => sum + p[1], 0) / vs2DPoints.length;
-
-        // 计算标准方法到质心的中位距离（2D欧氏距离）
-        const std2DDistances = std2DPoints.map(p =>
-        Math.sqrt(Math.pow(p[0] - std2DCentroidX, 2) + Math.pow(p[1] - std2DCentroidY, 2))
-        );
-        const std2DMedRadius = median(std2DDistances);
-
-        // 计算VS方法到质心的中位距离（2D欧氏距离）
-        const vs2DDistances = vs2DPoints.map(p =>
-            Math.sqrt(Math.pow(p[0] - vs2DCentroidX, 2) + Math.pow(p[1] - vs2DCentroidY, 2))
-        );
-        const vs2DMedRadius = median(vs2DDistances);
-        //11. 返回结果
-        return NextResponse.json({
-            question: sanitizedQuestion,
-            k: k,                              // 返回k值
-            stdResponses: stdResponsesSliced,  // 只返回用于计算的前k个
-            vsResponses: vsResponsesSliced,    // 只返回用于计算的前k个
-            rawStdText: stdText,               // 标准方法的原始响应
-            rawVsText: vsText,                 // VS方法的原始响应
-            prompts: {
-                stdSystemPrompt: stdSystemPrompt,  // 标准方法的完整系统提示词
-                vsSystemPrompt: vsSystemPrompt,    // VS方法的完整系统提示词
-            },
-            distances: {
-                stdIntra: stdIntraDistance,      //标准方法的内部距离
-                vsIntra: vsIntraDistance,        //VS的内部距离
-                inter: interDistance,            //类间距离
-                centroidShift: centroidDistance, //质心距离
-            },
-            visualization: {
-                embedding2D,
-                embedding3D,
-                // 2D质心和半径信息
-                centroids2D: {
-                    std: [std2DCentroidX, std2DCentroidY],
-                    vs: [vs2DCentroidX, vs2DCentroidY],
-                },
-                avgRadius2D: {
-                    std: std2DMedRadius,
-                    vs: vs2DMedRadius,
-                },
+        return new Response(stream, {
+            headers: {
+                'Content-Type': 'text/event-stream',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
             },
         });
 

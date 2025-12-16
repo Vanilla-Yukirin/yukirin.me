@@ -136,6 +136,48 @@
   color: #991b1b;
 }
 
+/* 加载指示器 */
+.loadingIndicator {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #dbeafe;
+  border: 1px solid #93c5fd;
+  border-radius: 4px;
+  color: #1e40af;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.loadingPlaceholder {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  min-height: 150px;
+  color: #6b7280;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* 通用section */
 .section {
   margin-bottom: 3rem;
