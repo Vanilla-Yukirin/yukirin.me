@@ -121,7 +121,9 @@ export default function VerbalizedSamplingPage() {
               switch (step) {
                 case 'prompts':
                   setStepStatus(prev => ({ ...prev, prompts: true }));
-                  setResult(prev => prev ? { ...prev, prompts: data } : null);
+                  setResult({
+                    prompts: data,
+                  } as ApiResponse);
                   setLoadingStep('正在生成标准方法回答...');
                   break;
 
