@@ -4,8 +4,8 @@ import { PCA } from 'ml-pca';
 
 //初始化 llm & emb客户端
 const llm = new OpenAI({
-  apiKey: process.env.SHENGSUAN_API_KEY,
-  baseURL: process.env.SHENGSUAN_BASE_URL,
+  apiKey: process.env.XIAOHUMI_API_KEY,
+  baseURL: process.env.XIAOHUMI_BASE_URL,
 });
 
 const emb = new OpenAI({
