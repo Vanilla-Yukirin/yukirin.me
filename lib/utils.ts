@@ -10,7 +10,7 @@ export function getCommitInfo() {
   const commitSha = process.env.NEXT_PUBLIC_COMMIT_SHA || 'unknown';
   const commitUrl =
     process.env.NEXT_PUBLIC_COMMIT_URL ||
-    `https://github.com/Vanilla-Yukirin/yukirin.me/commit/${commitSha}`;
+    `https://github.com/Vanilla-Yukirin/yukirin.me/`;
 
   return { commitSha, commitUrl };
 }

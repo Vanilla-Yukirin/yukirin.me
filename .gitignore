@@ -17,6 +17,7 @@ node_modules/
 # 环境变量
 .env*.local
 .env
+.env.production
 
 # 调试日志
 npm-debug.log*

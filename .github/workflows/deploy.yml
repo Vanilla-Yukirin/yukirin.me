@@ -11,22 +11,34 @@ jobs:
     steps:
       - name: Deploy Next.js App via SSH
         uses: appleboy/ssh-action@v1.0.3
+        # 注入 SILICONFLOW 环境变量
+        env:
+          SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
+          SILICONFLOW_BASE_URL: ${{ secrets.SILICONFLOW_BASE_URL }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # 通过ssh-action传环境变量
+          envs: SILICONFLOW_API_KEY,SILICONFLOW_BASE_URL
           port: 22000
           script: |
+            # -1. 设置脚本出错即退出
+            set -e
+
+            echo "🚀 开始部署 Next.js 应用..."
+
             # 0. 同步时间（GitHub Actions 时间准确，避免 NTP 不可用问题）
             # 获取当前 UTC 时间，转换为 CST 并设置到服务器
-            export SYNC_TIME=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
-            echo "⏰ 从 GitHub Actions 同步时间: $SYNC_TIME"
-            sudo date -s "$SYNC_TIME"
-            sudo hwclock --systohc --utc
-            echo "✅ 时间同步完成"
+            # export SYNC_TIME=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+            # echo "⏰ 从 GitHub Actions 同步时间: $SYNC_TIME"
+            # sudo date -s "$SYNC_TIME"
+            # sudo hwclock --systohc --utc
+            # echo "✅ 时间同步完成"
+            echo "✅ 不进行时间同步"
 
             # 1. 进入项目目录
-            cd /var/www/yukirin.me 
+            cd /var/www/yukirin.me
 
             # 2. 获取远程最新代码
             git fetch --all
@@ -35,20 +47,38 @@ jobs:
             git reset --hard origin/main
             
             # 3.5 注入当前提交信息到环境变量（构建时可用）
-            export NEXT_PUBLIC_COMMIT_SHA=$(git rev-parse --short HEAD)
-            export NEXT_PUBLIC_COMMIT_URL="https://github.com/Vanilla-Yukirin/yukirin.me/commit/${NEXT_PUBLIC_COMMIT_SHA}"
-            export NEXT_TELEMETRY_DISABLED=1
+            # export NEXT_PUBLIC_COMMIT_SHA=$(git rev-parse --short HEAD)
+            # export NEXT_PUBLIC_COMMIT_URL="https://github.com/Vanilla-Yukirin/yukirin.me/commit/${NEXT_PUBLIC_COMMIT_SHA}"
+            # export NEXT_TELEMETRY_DISABLED=1
 
-            # 4. 安装依赖（使用 ci 而不是 install，因为这是 CI/CD 环境）
+            # 4. 将环境变量写入 .env.production 文件
+            echo "📝 正在生成 .env.production..."
+            echo "# Auto-generated file. Do not edit." > .env.production
+            # SILCONFLOW
+            echo "SILICONFLOW_API_KEY=$SILICONFLOW_API_KEY" >> .env.production
+            echo "SILICONFLOW_BASE_URL=$SILICONFLOW_BASE_URL" >> .env.production
+            # Git Commit Info
+            COMMIT_SHA=$(git rev-parse --short HEAD)
+            echo "NEXT_PUBLIC_COMMIT_SHA=$COMMIT_SHA" >> .env.production
+            echo "NEXT_PUBLIC_COMMIT_URL=https://github.com/Vanilla-Yukirin/yukirin.me/commit/$COMMIT_SHA" >> .env.production
+            # Disable Telemetry
+            echo "NEXT_TELEMETRY_DISABLED=1" >> .env.production
+
+            chmod 600 .env.production
+            echo "✅ .env.production 写入完成"
+
+            # 5. 安装依赖
+            echo "📦 安装依赖..."
             npm ci
 
-            # 5. 构建 Next.js 应用（生成 .next 目录）
+            # 6. 构建 Next.js 应用（生成 .next 目录）
+            echo "🏗️ 开始构建..."
             npm run build
 
-            # 6. 重启应用（使用 PM2）
-            pm2 restart yukirin-site
+            # 7. 尝试 reload，失败则 start
+            pm2 reload yukirin-site --update-env || pm2 start ecosystem.config.js
 
-            # 7. 保存进程列表
+            # 8. 保存进程列表
             pm2 save
 
-            echo "✅ Next.js 部署成功！"
+            echo "✅ 部署成功！Current Commit: $COMMIT_SHA"
