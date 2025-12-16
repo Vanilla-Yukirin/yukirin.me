@@ -121,29 +121,30 @@ export default function VerbalizedSamplingPage() {
               switch (step) {
                 case 'prompts':
                   setStepStatus(prev => ({ ...prev, prompts: true }));
-                  setResult({
+                  setResult(prev => ({
+                    ...(prev || {}),
                     prompts: data,
-                  } as ApiResponse);
+                  } as ApiResponse));
                   setLoadingStep('正在生成标准方法回答...');
                   break;
 
                 case 'std_complete':
                   setStepStatus(prev => ({ ...prev, stdComplete: true }));
                   setResult(prev => ({
-                    ...prev!,
+                    ...(prev || {}),
                     stdResponses: data.responses,
                     rawStdText: data.rawText,
-                  }));
+                  } as ApiResponse));
                   setLoadingStep('正在生成 Verbalized Sampling 回答...');
                   break;
 
                 case 'vs_complete':
                   setStepStatus(prev => ({ ...prev, vsComplete: true }));
                   setResult(prev => ({
-                    ...prev!,
+                    ...(prev || {}),
                     vsResponses: data.responses,
                     rawVsText: data.rawText,
-                  }));
+                  } as ApiResponse));
                   setLoadingStep('正在计算 Embedding...');
                   break;
 
@@ -155,12 +156,12 @@ export default function VerbalizedSamplingPage() {
                 case 'metrics_complete':
                   setStepStatus(prev => ({ ...prev, metricsComplete: true }));
                   setResult(prev => ({
-                    ...prev!,
+                    ...(prev || {}),
                     question: data.question,
                     k: data.k,
                     distances: data.distances,
                     visualization: data.visualization,
-                  }));
+                  } as ApiResponse));
                   setLoadingStep('');
                   break;
 
