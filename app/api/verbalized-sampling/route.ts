@@ -17,7 +17,7 @@ const emb = new OpenAI({
 const llmModel = 'openai/gpt-5-mini';
 const embModel = 'Qwen/Qwen3-Embedding-0.6B';
 
-export function parseResponses(text: string, k: number): string[] {
+function parseResponses(text: string, k: number): string[] {
     // 先移除可能的外层 <responses> 标签
     text = text.replace(/<\/?responses>/g, '');
 
@@ -87,7 +87,7 @@ export function parseResponses(text: string, k: number): string[] {
 }
 
 
-export function cosineSimilarity(vecA: number[], vecB: number[]): number {
+function cosineSimilarity(vecA: number[], vecB: number[]): number {
     const dotProduct = vecA.reduce((sum, a, idx) => sum + a * vecB[idx], 0);
     const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
     const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
@@ -97,15 +97,15 @@ export function cosineSimilarity(vecA: number[], vecB: number[]): number {
     return dotProduct / (magnitudeA * magnitudeB);
 }
 
-export function cosineDistance(vecA: number[], vecB: number[]): number {
+function cosineDistance(vecA: number[], vecB: number[]): number {
     return 1 - cosineSimilarity(vecA, vecB);
 }
 
-export function average(arr: number[]): number {
+function average(arr: number[]): number {
     return arr.reduce((a, b) => a + b, 0) / arr.length;
 }
 
-export function calcCentroid(vectors: number[][]): number[] {
+function calcCentroid(vectors: number[][]): number[] {
     const length = vectors[0].length;
     const avgVector = new Array(length).fill(0);
 
@@ -122,7 +122,7 @@ export function calcCentroid(vectors: number[][]): number[] {
     return avgVector;
 }
 
-export function median(arr: number[]): number {
+function median(arr: number[]): number {
     const sorted = arr.slice().sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
 
