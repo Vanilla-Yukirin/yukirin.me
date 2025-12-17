@@ -19,6 +19,8 @@ jobs:
           SHENGSUAN_BASE_URL: ${{ secrets.SHENGSUAN_BASE_URL }}
           XIAOHUMI_API_KEY: ${{ secrets.XIAOHUMI_API_KEY }}
           XIAOHUMI_BASE_URL: ${{ secrets.XIAOHUMI_BASE_URL }}
+          OPENAIHK_API_KEY: ${{ secrets.OPENAIHK_API_KEY }}
+          OPENAIHK_BASE_URL: ${{ secrets.OPENAIHK_BASE_URL }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
@@ -67,6 +69,9 @@ jobs:
             # XIAOHUMI
             echo "XIAOHUMI_API_KEY=$XIAOHUMI_API_KEY" >> .env.production
             echo "XIAOHUMI_BASE_URL=$XIAOHUMI_BASE_URL" >> .env.production
+            # OPENAIHK
+            echo "OPENAIHK_API_KEY=$OPENAIHK_API_KEY" >> .env.production
+            echo "OPENAIHK_BASE_URL=$OPENAIHK_BASE_URL" >> .env.production
             # Git Commit Info
             COMMIT_SHA=$(git rev-parse --short HEAD)
             echo "NEXT_PUBLIC_COMMIT_SHA=$COMMIT_SHA" >> .env.production
