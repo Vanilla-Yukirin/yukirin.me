@@ -115,7 +115,8 @@ export default async function HomePage() {
               {commitSha}
             </a>
           </p>
-          <p className={styles.quote}>&quot;Stay hungry, stay foolish.&quot;</p>
+          {/* 暂时隐去quote */}
+          {/* <p className={styles.quote}>&quot;Stay hungry, stay foolish.&quot;</p> */}
         </footer>
     </div>
   );
