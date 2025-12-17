@@ -12,10 +12,9 @@ export const CONFIG = {
 
   // 可用的 LLM 模型
   LLM_MODELS: [
-    { value: 'gpt-5-nano', label: 'GPT-5 Nano' },
-    { value: 'gpt-5-mini', label: 'GPT-5 Mini' },
-    // { value: 'gpt-5', label: 'GPT-5' },
-    // { value: 'gpt-5.1', label: 'GPT-5.1' }
+    // { value: 'gpt-5-nano', label: 'GPT-5 Nano' },
+    // { value: 'gpt-5-mini', label: 'GPT-5 Mini' },
+    { value: 'Qwen/Qwen3-Next-80B-A3B-Instruct', label: 'Qwen3-Next-80B-A3B-Instruct' },
   ],
-  DEFAULT_MODEL: 'gpt-5-nano',
+  DEFAULT_MODEL: 'Qwen/Qwen3-Next-80B-A3B-Instruct',
 };

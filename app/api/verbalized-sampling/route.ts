@@ -4,8 +4,8 @@ import { PCA } from 'ml-pca';
 
 //初始化 llm & emb客户端
 const llm = new OpenAI({
-  apiKey: process.env.OPENAIHK_API_KEY,
-  baseURL: process.env.OPENAIHK_BASE_URL,
+  apiKey: process.env.SILICONFLOW_API_KEY,
+  baseURL: process.env.SILICONFLOW_BASE_URL,
 });
 
 const emb = new OpenAI({
@@ -178,6 +178,13 @@ export async function POST(request: Request) {
 
         //4. 调用LLM两次
         console.log("开始生成标准回答...");
+        console.log("请求参数:", {
+          model,
+          temperature,
+          question: sanitizedQuestion,
+          max_tokens: 4096
+        });
+
         const stdCompletion = await llm.chat.completions.create({
           model: model,  // 使用前端传入的模型
           messages: [
@@ -186,8 +193,7 @@ export async function POST(request: Request) {
           ],
           temperature: temperature,  // 使用前端传入的温度
           max_tokens: 4096,
-          enable_thinking: false,
-        } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
+        });
 
         console.log("开始生成Verbalized Sampling回答...");
         const vsCompletion = await llm.chat.completions.create({
@@ -198,8 +204,7 @@ export async function POST(request: Request) {
           ],
           temperature: temperature,  // 使用前端传入的温度
           max_tokens: 4096,
-          enable_thinking: false,
-        } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
+        });
 
         //5. 解析返回的结果
         const stdText = stdCompletion.choices[0]?.message?.content || '';
