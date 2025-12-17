@@ -14,7 +14,11 @@ export const CONFIG = {
   LLM_MODELS: [
     // { value: 'gpt-5-nano', label: 'GPT-5 Nano' },
     // { value: 'gpt-5-mini', label: 'GPT-5 Mini' },
+    { value: 'Qwen/Qwen3-8B', label: 'Qwen3-8B' },
+    { value: 'Qwen/Qwen3-30B-A3B-Instruct-2507', label: 'Qwen3-30B-A3B-Instruct-2507' },
     { value: 'Qwen/Qwen3-Next-80B-A3B-Instruct', label: 'Qwen3-Next-80B-A3B-Instruct' },
+    { value: 'deepseek-ai/DeepSeek-V3', label: 'DeepSeek-V3' },
+    { value: 'deepseek-ai/DeepSeek-V3.2', label: 'DeepSeek-V3.2(no thinking)' },
   ],
   DEFAULT_MODEL: 'Qwen/Qwen3-Next-80B-A3B-Instruct',
 };

@@ -182,7 +182,7 @@ export async function POST(request: Request) {
           model,
           temperature,
           question: sanitizedQuestion,
-          max_tokens: 4096
+          max_tokens: 4096,
         });
 
         const stdCompletion = await llm.chat.completions.create({
@@ -193,7 +193,8 @@ export async function POST(request: Request) {
           ],
           temperature: temperature,  // 使用前端传入的温度
           max_tokens: 4096,
-        });
+          enable_thinking: false,
+        } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
 
         console.log("开始生成Verbalized Sampling回答...");
         const vsCompletion = await llm.chat.completions.create({
@@ -204,7 +205,8 @@ export async function POST(request: Request) {
           ],
           temperature: temperature,  // 使用前端传入的温度
           max_tokens: 4096,
-        });
+          enable_thinking: false,
+        } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
 
         //5. 解析返回的结果
         const stdText = stdCompletion.choices[0]?.message?.content || '';
