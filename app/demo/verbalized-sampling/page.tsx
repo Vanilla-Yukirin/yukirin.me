@@ -188,6 +188,24 @@ export default function VerbalizedSamplingPage() {
               }
             } catch (parseError) {
               console.error('解析流数据失败:', parseError);
+              // If the line is for a critical event, propagate the error to the user and stop processing
+              try {
+                const maybeStep = JSON.parse(jsonStr)?.step;
+                if (maybeStep === 'metrics_complete') {
+                  setError('解析关键数据失败，请重试。');
+                  setLoading(false);
+                  setLoadingStep('');
+                  return;
+                }
+              } catch {
+                // If we can't even parse the step, be conservative and check for the string
+                if (jsonStr.includes('"step":"metrics_complete"')) {
+                  setError('解析关键数据失败，请重试。');
+                  setLoading(false);
+                  setLoadingStep('');
+                  return;
+                }
+              }
             }
           }
         }
