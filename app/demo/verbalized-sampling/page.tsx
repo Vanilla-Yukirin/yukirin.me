@@ -28,7 +28,7 @@ interface ApiResponse {
       std: [number, number];
       vs: [number, number];
     };
-    avgRadius2D: {
+    medRadius2D: {
       std: number;
       vs: number;
     };
@@ -608,7 +608,7 @@ export default function VerbalizedSamplingPage() {
                     <circle
                       cx={result.visualization!.centroids2D!.std[0] * scale + 300}
                       cy={-result.visualization!.centroids2D!.std[1] * scale + 200}
-                      r={result.visualization!.avgRadius2D!.std * scale}
+                      r={result.visualization!.medRadius2D!.std * scale}
                       fill="none"
                       stroke="#3b82f6"
                       strokeWidth="2"
@@ -620,7 +620,7 @@ export default function VerbalizedSamplingPage() {
                     <circle
                       cx={result.visualization!.centroids2D!.vs[0] * scale + 300}
                       cy={-result.visualization!.centroids2D!.vs[1] * scale + 200}
-                      r={result.visualization!.avgRadius2D!.vs * scale}
+                      r={result.visualization!.medRadius2D!.vs * scale}
                       fill="none"
                       stroke="#ef4444"
                       strokeWidth="2"
