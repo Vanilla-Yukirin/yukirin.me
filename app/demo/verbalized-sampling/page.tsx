@@ -212,10 +212,12 @@ export default function VerbalizedSamplingPage() {
       }
     } catch (err: any) {
       setError(err.message);
-    } finally {
       setLoading(false);
       setLoadingStep('');
     }
+    // After stream is fully processed, reset loading states
+    setLoading(false);
+    setLoadingStep('');
   };
 
   const handleQuestionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
