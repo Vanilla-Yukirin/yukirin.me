@@ -390,7 +390,14 @@ export async function POST(request: Request) {
                     controller.close();
                 } catch (error) {
                     console.log('Stream Error:', error);
-                    const errorMessage = `data: ${JSON.stringify({ step: 'error', data: { message: '服务器内部错误' } })}\n\n`;
+                    // Include error details in the message for debugging
+                    let errorInfo: { message: string; name?: string } = { message: '服务器内部错误' };
+                    if (error instanceof Error) {
+                        errorInfo = { message: error.message, name: error.name };
+                    } else if (typeof error === 'string') {
+                        errorInfo = { message: error };
+                    }
+                    const errorMessage = `data: ${JSON.stringify({ step: 'error', data: errorInfo })}\n\n`;
                     controller.enqueue(encoder.encode(errorMessage));
                     controller.close();
                 }
