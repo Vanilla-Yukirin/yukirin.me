@@ -2,25 +2,23 @@
 
 > 基于 Next.js 14 (App Router) + TypeScript 构建的现代化个人网站
 
+送给自己的礼物 🎁
+
 ## 🚀 项目特点
 
-- ✅ **Next.js 14 App Router**: 使用最新的 App Router 架构
-- ✅ **TypeScript**: 完整的类型安全支持
-- ✅ **服务端渲染 (SSR/SSG)**: 所有数据在服务端读取，消除客户端 fetch 闪烁
-- ✅ **模块化设计**: 清晰的项目结构，易于维护和扩展
-- ✅ **静态色板**: 统一的颜色管理系统（`lib/colors.ts`）
-- ✅ **API 路由预留**: 为未来功能（登录、数据库、上传）预留接口
-- ✅ **响应式设计**: 完美适配各种设备尺寸
-- ✅ **中文注释**: 所有代码都有完整的中文注释
+- **Next.js 14 App Router**: 使用最新的 App Router 架构
+- **TypeScript**: 完整的类型安全支持
+- **服务端渲染 (SSR/SSG)**: 所有数据在服务端读取，消除客户端 fetch 闪烁
+- **模块化设计**: 清晰的项目结构，易于维护和扩展
+- 预留 API 路由，为未来功能（登录、数据库、上传）预留接口
+- 响应式设计，适配各种设备尺寸
 
 ## 📁 项目结构
 
 ```
 yukirin.me/
-├── app/                      # Next.js App Router 目录
+├── app/                     # Next.js App Router 目录
 │   ├── api/                 # API 路由
-│   │   └── hello/           # 示例 API
-│   │       └── route.ts     # API 处理函数
 │   ├── cv-pink/             # 粉色简历页
 │   │   └── page.tsx         # 简历页面组件
 │   ├── cv-blue/             # 蓝色简历页
@@ -32,20 +30,21 @@ yukirin.me/
 │   ├── BackgroundCanvas.tsx # 背景动画组件
 │   └── ProjectCard.tsx      # 项目卡片组件
 ├── data/                    # 数据文件
-│   ├── about.md            # 关于我（Markdown）
-│   ├── data.json           # 主页数据
-│   ├── cv-pink.json        # 粉色简历数据
-│   └── cv-blue.json        # 蓝色简历数据
+│   ├── about.md             # 关于我
+│   ├── data.json            # 主页数据
+│   ├── cv-pink.json         # 粉色简历数据
+│   └── cv-blue.json         # 蓝色简历数据
 ├── lib/                     # 工具函数和配置
-│   ├── colors.ts           # 颜色常量配置
-│   ├── data.ts             # 数据加载工具
-│   └── types.ts            # TypeScript 类型定义
+│   ├── colors.ts            # 颜色常量配置
+│   ├── data.ts              # 数据加载工具
+│   └── types.ts             # TypeScript 类型定义
 ├── public/                  # 静态资源
-│   ├── fonts/              # 本地字体文件
-│   └── images/             # 图片资源
-├── next.config.js          # Next.js 配置
-├── tsconfig.json           # TypeScript 配置
-└── package.json            # 项目依赖
+│   ├── fonts/               # 字体放这
+│   └── images/              # 图片放这
+├── next.config.js           # Next.js 配置
+├── tsconfig.json            # TS 配置
+├── .env.local               # 环境变量
+└── package.json             # 项目依赖
 
 ```
 
