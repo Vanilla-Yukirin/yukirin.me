@@ -89,7 +89,25 @@ export default function VerbalizedSamplingPage() {
       });
 
       if (!response.ok) {
-        throw new Error('请求失败');
+        // Try to extract error message from response body
+        let errorMsg = '请求失败';
+        try {
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const data = await response.json();
+            if (data && data.error) {
+              errorMsg = data.error;
+            }
+          } else {
+            const text = await response.text();
+            if (text) {
+              errorMsg = text;
+            }
+          }
+        } catch (e) {
+          // Ignore parsing errors, use default errorMsg
+        }
+        throw new Error(errorMsg);
       }
 
       const reader = response.body?.getReader();
