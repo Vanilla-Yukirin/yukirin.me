@@ -379,7 +379,7 @@ export async function POST(request: Request) {
                                 std: [std2DCentroidX, std2DCentroidY],
                                 vs: [vs2DCentroidX, vs2DCentroidY],
                             },
-                            avgRadius2D: {
+                            medRadius2D: {
                                 std: std2DMedRadius,
                                 vs: vs2DMedRadius,
                             },
