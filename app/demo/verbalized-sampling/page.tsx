@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CONFIG } from './config';
 import styles from './page.module.css';
 
@@ -44,13 +44,16 @@ interface StepStatus {
   metricsComplete: boolean;
 }
 
+// 使用 Partial 类型来表示渐进式构建的结果，提高类型安全性
+type PartialApiResponse = Partial<ApiResponse>;
+
 export default function VerbalizedSamplingPage() {
   const [question, setQuestion] = useState('');
   const [temperature, setTemperature] = useState(CONFIG.DEFAULT_TEMPERATURE);
   const [k, setK] = useState(CONFIG.DEFAULT_K);
   const [model, setModel] = useState(CONFIG.DEFAULT_MODEL);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<ApiResponse | null>(null);
+  const [result, setResult] = useState<PartialApiResponse | null>(null);
   const [error, setError] = useState('');
   
   // 新增：分步状态
@@ -62,6 +65,18 @@ export default function VerbalizedSamplingPage() {
     metricsComplete: false,
   });
   const [loadingStep, setLoadingStep] = useState<string>('');
+  const [readerRef, setReaderRef] = useState<ReadableStreamDefaultReader<Uint8Array> | null>(null);
+
+  // 组件卸载时清理流资源
+  useEffect(() => {
+    return () => {
+      if (readerRef) {
+        readerRef.cancel().catch(() => {
+          // Ignore cleanup errors
+        });
+      }
+    };
+  }, [readerRef]);
 
   const handleSubmit = async () => {
     if (!question.trim()) {
@@ -80,6 +95,8 @@ export default function VerbalizedSamplingPage() {
       metricsComplete: false,
     });
     setLoadingStep('正在初始化...');
+
+    let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
 
     try {
       const response = await fetch('/api/verbalized-sampling', {
@@ -110,13 +127,14 @@ export default function VerbalizedSamplingPage() {
         throw new Error(errorMsg);
       }
 
-      const reader = response.body?.getReader();
+      reader = response.body?.getReader() || null;
       const decoder = new TextDecoder();
 
       if (!reader) {
         throw new Error('无法读取响应流');
       }
 
+      setReaderRef(reader);
       let buffer = '';
 
       while (true) {
@@ -142,7 +160,7 @@ export default function VerbalizedSamplingPage() {
                   setResult(prev => ({
                     ...(prev || {}),
                     prompts: data,
-                  } as ApiResponse));
+                  }));
                   setLoadingStep('正在生成标准方法回答...');
                   break;
 
@@ -152,7 +170,7 @@ export default function VerbalizedSamplingPage() {
                     ...(prev || {}),
                     stdResponses: data.responses,
                     rawStdText: data.rawText,
-                  } as ApiResponse));
+                  }));
                   setLoadingStep('正在生成 Verbalized Sampling 回答...');
                   break;
 
@@ -162,7 +180,7 @@ export default function VerbalizedSamplingPage() {
                     ...(prev || {}),
                     vsResponses: data.responses,
                     rawVsText: data.rawText,
-                  } as ApiResponse));
+                  }));
                   setLoadingStep('正在计算 Embedding...');
                   break;
 
@@ -179,8 +197,9 @@ export default function VerbalizedSamplingPage() {
                     k: data.k,
                     distances: data.distances,
                     visualization: data.visualization,
-                  } as ApiResponse));
+                  }));
                   setLoadingStep('');
+                  setLoading(false); // 流处理完成后设置 loading 为 false
                   break;
 
                 case 'error':
@@ -188,23 +207,13 @@ export default function VerbalizedSamplingPage() {
               }
             } catch (parseError) {
               console.error('解析流数据失败:', parseError);
-              // If the line is for a critical event, propagate the error to the user and stop processing
-              try {
-                const maybeStep = JSON.parse(jsonStr)?.step;
-                if (maybeStep === 'metrics_complete') {
-                  setError('解析关键数据失败，请重试。');
-                  setLoading(false);
-                  setLoadingStep('');
-                  return;
-                }
-              } catch {
-                // If we can't even parse the step, be conservative and check for the string
-                if (jsonStr.includes('"step":"metrics_complete"')) {
-                  setError('解析关键数据失败，请重试。');
-                  setLoading(false);
-                  setLoadingStep('');
-                  return;
-                }
+              // 对于关键事件的解析失败，向用户显示错误
+              if (jsonStr.includes('metrics_complete')) {
+                setError('解析关键数据失败，请重试。');
+                setLoading(false);
+                setLoadingStep('');
+                reader?.cancel();
+                return;
               }
             }
           }
@@ -212,12 +221,21 @@ export default function VerbalizedSamplingPage() {
       }
     } catch (err: any) {
       setError(err.message);
-      setLoading(false);
-      setLoadingStep('');
+    } finally {
+      // 清理 reader 资源
+      if (reader) {
+        try {
+          await reader.cancel();
+        } catch (e) {
+          // Ignore cleanup errors
+        }
+      }
+      setReaderRef(null);
+      // 只有在 loading 仍然为 true 时才重置（避免覆盖 metrics_complete 中的设置）
+      if (loading) {
+        setLoadingStep('');
+      }
     }
-    // After stream is fully processed, reset loading states
-    setLoading(false);
-    setLoadingStep('');
   };
 
   const handleQuestionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -462,7 +480,7 @@ export default function VerbalizedSamplingPage() {
               <h3 className={styles.subtitle}>指标说明</h3>
               <ul className={styles.explanationList}>
                 <li>
-                  <strong>类内平均距离</strong>: 同组内{result.k}个回答之间的平均余弦距离，
+                  <strong>类内平均距离</strong>: 同组内{result.k || k}个回答之间的平均余弦距离，
                   <span className={styles.highlight}>值越大表示多样性越高</span>
                 </li>
                 <li>
@@ -494,7 +512,7 @@ export default function VerbalizedSamplingPage() {
       )}
       
       {/* 2D可视化 */}
-      {result && stepStatus.metricsComplete && result.visualization && (
+      {result && stepStatus.metricsComplete && result.visualization && result.k && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>PCA 降维可视化 (2D)</h2>
           <div className={styles.visualization}>
@@ -528,7 +546,8 @@ export default function VerbalizedSamplingPage() {
 
               {/* 计算合适的缩放比例 */}
               {(() => {
-                const allPoints = result.visualization.embedding2D;
+                const allPoints = result.visualization!.embedding2D;
+                const k = result.k!;
                 const xValues = allPoints.map(p => p[0]);
                 const yValues = allPoints.map(p => p[1]);
                 const maxX = Math.max(...xValues.map(Math.abs));
@@ -538,7 +557,7 @@ export default function VerbalizedSamplingPage() {
                 return (
                   <>
                     {/* 标准方法的点（蓝色） */}
-                    {allPoints.slice(0, result.k).map((point, idx) => (
+                    {allPoints.slice(0, k).map((point, idx) => (
                       <g key={`std-${idx}`}>
                         <circle
                           cx={point[0] * scale + 300}
@@ -562,7 +581,7 @@ export default function VerbalizedSamplingPage() {
                     ))}
 
                     {/* VS方法的点（红色） */}
-                    {allPoints.slice(result.k, result.k * 2).map((point, idx) => (
+                    {allPoints.slice(k, k * 2).map((point, idx) => (
                       <g key={`vs-${idx}`}>
                         <circle
                           cx={point[0] * scale + 300}
@@ -587,9 +606,9 @@ export default function VerbalizedSamplingPage() {
 
                     {/* 标准方法的范围圆（虚线） */}
                     <circle
-                      cx={result.visualization.centroids2D.std[0] * scale + 300}
-                      cy={-result.visualization.centroids2D.std[1] * scale + 200}
-                      r={result.visualization.avgRadius2D.std * scale}
+                      cx={result.visualization!.centroids2D!.std[0] * scale + 300}
+                      cy={-result.visualization!.centroids2D!.std[1] * scale + 200}
+                      r={result.visualization!.avgRadius2D!.std * scale}
                       fill="none"
                       stroke="#3b82f6"
                       strokeWidth="2"
@@ -599,9 +618,9 @@ export default function VerbalizedSamplingPage() {
 
                     {/* VS方法的范围圆（虚线） */}
                     <circle
-                      cx={result.visualization.centroids2D.vs[0] * scale + 300}
-                      cy={-result.visualization.centroids2D.vs[1] * scale + 200}
-                      r={result.visualization.avgRadius2D.vs * scale}
+                      cx={result.visualization!.centroids2D!.vs[0] * scale + 300}
+                      cy={-result.visualization!.centroids2D!.vs[1] * scale + 200}
+                      r={result.visualization!.avgRadius2D!.vs * scale}
                       fill="none"
                       stroke="#ef4444"
                       strokeWidth="2"
@@ -611,8 +630,8 @@ export default function VerbalizedSamplingPage() {
 
                     {/* 标准方法的质心（空心） */}
                     <circle
-                      cx={result.visualization.centroids2D.std[0] * scale + 300}
-                      cy={-result.visualization.centroids2D.std[1] * scale + 200}
+                      cx={result.visualization!.centroids2D!.std[0] * scale + 300}
+                      cy={-result.visualization!.centroids2D!.std[1] * scale + 200}
                       r="8"
                       fill="white"
                       stroke="#3b82f6"
@@ -620,8 +639,8 @@ export default function VerbalizedSamplingPage() {
                       opacity="0.9"
                     />
                     <text
-                      x={result.visualization.centroids2D.std[0] * scale + 300}
-                      y={-result.visualization.centroids2D.std[1] * scale + 200 - 15}
+                      x={result.visualization!.centroids2D!.std[0] * scale + 300}
+                      y={-result.visualization!.centroids2D!.std[1] * scale + 200 - 15}
                       fontSize="12"
                       fill="#1e40af"
                       textAnchor="middle"
@@ -632,8 +651,8 @@ export default function VerbalizedSamplingPage() {
 
                     {/* VS方法的质心（空心） */}
                     <circle
-                      cx={result.visualization.centroids2D.vs[0] * scale + 300}
-                      cy={-result.visualization.centroids2D.vs[1] * scale + 200}
+                      cx={result.visualization!.centroids2D!.vs[0] * scale + 300}
+                      cy={-result.visualization!.centroids2D!.vs[1] * scale + 200}
                       r="8"
                       fill="white"
                       stroke="#ef4444"
@@ -641,8 +660,8 @@ export default function VerbalizedSamplingPage() {
                       opacity="0.9"
                     />
                     <text
-                      x={result.visualization.centroids2D.vs[0] * scale + 300}
-                      y={-result.visualization.centroids2D.vs[1] * scale + 200 - 15}
+                      x={result.visualization!.centroids2D!.vs[0] * scale + 300}
+                      y={-result.visualization!.centroids2D!.vs[1] * scale + 200 - 15}
                       fontSize="12"
                       fill="#991b1b"
                       textAnchor="middle"
@@ -657,11 +676,11 @@ export default function VerbalizedSamplingPage() {
             <div className={styles.legend}>
               <div className={styles.legendItem}>
                 <span className={styles.legendDot} style={{ backgroundColor: '#3b82f6' }}></span>
-                <span>标准方法 (S1-S{result.k})</span>
+                <span>标准方法 (S1-S{result.k!})</span>
               </div>
               <div className={styles.legendItem}>
                 <span className={styles.legendDot} style={{ backgroundColor: '#ef4444' }}></span>
-                <span>Verbalized Sampling (V1-V{result.k})</span>
+                <span>Verbalized Sampling (V1-V{result.k!})</span>
               </div>
               <div className={styles.legendItem}>
                 <span className={styles.legendDot} style={{ backgroundColor: 'white', border: '2px solid #64748b' }}></span>

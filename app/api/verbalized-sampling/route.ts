@@ -179,7 +179,17 @@ export async function POST(request: Request) {
         const stream = new ReadableStream({
             async start(controller) {
                 try {
-                    // 辅助函数：发送事件
+                    /**
+                     * 辅助函数：发送 SSE 事件到客户端
+                     * @param step - 事件类型，可选值：
+                     *   - 'prompts': 系统提示词已生成
+                     *   - 'std_complete': 标准方法回答完成
+                     *   - 'vs_complete': Verbalized Sampling 回答完成
+                     *   - 'embedding_complete': Embedding 计算完成
+                     *   - 'metrics_complete': 指标和可视化数据完成
+                     *   - 'error': 错误信息
+                     * @param data - 事件相关的数据对象
+                     */
                     const sendEvent = (step: string, data: any) => {
                         const message = `data: ${JSON.stringify({ step, data })}\n\n`;
                         controller.enqueue(encoder.encode(message));
@@ -206,20 +216,35 @@ export async function POST(request: Request) {
                         vsSystemPrompt,
                     });
 
-                    //4. 调用LLM - 标准方法
-                    console.log("开始生成标准回答...");
+                    //4. 并行调用LLM - 标准方法和VS方法
+                    console.log("开始并行生成标准回答和Verbalized Sampling回答...");
                     const llmClient = getLLMClient();
-                    const stdCompletion = await llmClient.chat.completions.create({
-                        model: model,
-                        messages: [
-                            { role: 'system', content: stdSystemPrompt },
-                            { role: 'user', content: sanitizedQuestion }
-                        ],
-                        temperature: temperature,
-                        max_tokens: 4096,
-                        enable_thinking: false,
-                    } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
+                    
+                    // 并行执行两个LLM调用以减少总等待时间
+                    const [stdCompletion, vsCompletion] = await Promise.all([
+                        llmClient.chat.completions.create({
+                            model: model,
+                            messages: [
+                                { role: 'system', content: stdSystemPrompt },
+                                { role: 'user', content: sanitizedQuestion }
+                            ],
+                            temperature: temperature,
+                            max_tokens: 4096,
+                            enable_thinking: false,
+                        } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming),
+                        llmClient.chat.completions.create({
+                            model: model,
+                            messages: [
+                                { role: 'system', content: vsSystemPrompt },
+                                { role: 'user', content: sanitizedQuestion }
+                            ],
+                            temperature: temperature,
+                            max_tokens: 4096,
+                            enable_thinking: false,
+                        } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming)
+                    ]);
 
+                    // 处理标准方法结果
                     const stdText = stdCompletion.choices[0]?.message?.content || '';
                     console.log("=== 标准方法返回的原始文本 ====");
                     console.log(stdText);
@@ -244,19 +269,7 @@ export async function POST(request: Request) {
                         rawText: stdText,
                     });
 
-                    //5. 调用LLM - VS方法
-                    console.log("开始生成Verbalized Sampling回答...");
-                    const vsCompletion = await llmClient.chat.completions.create({
-                        model: model,
-                        messages: [
-                            { role: 'system', content: vsSystemPrompt },
-                            { role: 'user', content: sanitizedQuestion }
-                        ],
-                        temperature: temperature,
-                        max_tokens: 4096,
-                        enable_thinking: false,
-                    } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
-
+                    // 处理VS方法结果
                     const vsText = vsCompletion.choices[0]?.message?.content || '';
                     console.log("=== Verbalized Sampling 返回的原始文本 ====");
                     console.log(vsText);
