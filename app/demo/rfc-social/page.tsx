@@ -21,6 +21,18 @@ export default function RfcSocialPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ApiResponse | null>(null);
   const [error, setError] = useState('');
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
+  const handleCopy = async (code: string, name: string, index: number) => {
+    const textToCopy = `${code} ${name}`;
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setCopiedIndex(index);
+      setTimeout(() => setCopiedIndex(null), 2000);
+    } catch (err) {
+      console.error('复制失败:', err);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!userInput.trim()) {
@@ -175,8 +187,19 @@ export default function RfcSocialPage() {
                   {suggestion.reason}
                 </div>
                 <div className={styles.usage}>
-                  <strong>回复示例：</strong>
-                  「{suggestion.code} {suggestion.name}」
+                  <div className={styles.usageContent}>
+                    <div>
+                      <strong>回复示例：</strong>
+                      「{suggestion.code} {suggestion.name}」
+                    </div>
+                    <button
+                      className={styles.copyButton}
+                      onClick={() => handleCopy(suggestion.code, suggestion.name, index)}
+                      title="复制到剪贴板"
+                    >
+                      {copiedIndex === index ? '已复制' : '复制'}
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
