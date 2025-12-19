@@ -88,6 +88,8 @@ async function getRfcSocialContent(): Promise<string> {
 
 export async function POST(request: Request) {
   try {
+    console.log('📨 收到 RFC Social 请求');
+
     const body = await request.json();
     const { userInput, model } = body;
 
@@ -96,8 +98,14 @@ export async function POST(request: Request) {
       ? JSON.parse(model)
       : model;
 
+    console.log('🔧 使用模型配置:', {
+      API: modelConfig?.API,
+      model: modelConfig?.model,
+    });
+
     // 验证模型配置
     if (!modelConfig || !modelConfig.API || !modelConfig.model) {
+      console.error('❌ 模型配置无效');
       return NextResponse.json(
         { error: '无效的模型配置' },
         { status: 400 }
@@ -106,6 +114,7 @@ export async function POST(request: Request) {
 
     // 验证输入
     if (!userInput || typeof userInput !== 'string') {
+      console.error('❌ 输入格式无效');
       return NextResponse.json(
         { error: '无效的输入格式' },
         { status: 400 }
@@ -114,6 +123,7 @@ export async function POST(request: Request) {
 
     // 限制输入长度
     if (userInput.length > 200) {
+      console.error('❌ 输入过长:', userInput.length, '字符');
       return NextResponse.json(
         { error: '输入过长，请不要超过200字符' },
         { status: 400 }
@@ -121,11 +131,12 @@ export async function POST(request: Request) {
     }
 
     const sanitizedInput = userInput.trim().slice(0, 200);
+    console.log('✅ 用户输入:', sanitizedInput);
 
     // 安全检测：检查用户输入是否包含恶意内容
     const securityCheck = detectMaliciousInput(sanitizedInput);
     if (!securityCheck.safe) {
-      console.warn('🚨 检测到恶意输入:', {
+      console.warn('🚨 安全检测触发:', {
         input: sanitizedInput,
         reason: securityCheck.reason,
         confidence: securityCheck.confidence,
@@ -145,8 +156,11 @@ export async function POST(request: Request) {
       });
     }
 
+    console.log('✅ 安全检测通过');
+
     // 获取 RFC Social 提示词内容
     const rfcContent = await getRfcSocialContent();
+    console.log('📄 RFC 提示词已加载，长度:', rfcContent.length, '字符');
 
     // 构造系统提示词
     const systemPrompt = `你是一个幽默风趣的社交助手。你的任务是基于HTTP状态码提供社交建议。
@@ -202,7 +216,10 @@ ${sanitizedInput}
 请基于此情况，从<RFC_DATA>中推荐合适的HTTP响应码。`;
 
     // 调用 LLM
+    console.log('🤖 开始调用 LLM...');
     const llmClient = getLLMClient(modelConfig.API);
+    const startTime = Date.now();
+
     const completion = await llmClient.chat.completions.create({
       model: modelConfig.model,
       messages: [
@@ -217,9 +234,13 @@ ${sanitizedInput}
       thinking_budget: 240,
     } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
 
+    const duration = Date.now() - startTime;
     const responseText = completion.choices[0]?.message?.content || '';
 
-    // 仅在开发环境记录完整响应（包括 thinking）
+    console.log('✅ LLM 响应完成，耗时:', duration, 'ms');
+    console.log('📝 响应长度:', responseText.length, '字符');
+
+    // 在开发环境记录完整响应（包括 thinking）
     if (process.env.NODE_ENV === 'development') {
       const message = completion.choices[0]?.message as any;
       console.log('=== LLM完整响应 ===');
@@ -233,6 +254,7 @@ ${sanitizedInput}
     }
 
     // 解析 JSON 响应
+    console.log('🔍 开始解析 LLM 响应...');
     try {
       // 首先尝试去除 markdown 代码块标记
       let cleanedText = responseText.trim();
@@ -243,11 +265,12 @@ ${sanitizedInput}
       // 尝试提取JSON对象
       const jsonMatch = cleanedText.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        console.error('无法提取JSON，原始响应为:', responseText);
+        console.error('❌ 无法提取JSON，原始响应为:', responseText);
         throw new Error('无法从响应中提取JSON');
       }
 
       const result = JSON.parse(jsonMatch[0]);
+      console.log('✅ JSON 解析成功，建议数量:', result.suggestions?.length || 0);
 
       // 验证响应格式
       if (!result.suggestions || !Array.isArray(result.suggestions)) {
@@ -255,13 +278,14 @@ ${sanitizedInput}
       }
 
       // 清理和验证每个建议项的字段
-      const sanitizedSuggestions = result.suggestions.map((suggestion: any) => {
+      console.log('🔧 开始验证和清理建议项...');
+      const sanitizedSuggestions = result.suggestions.map((suggestion: any, index: number) => {
         // 验证 HTTP 状态码
         const rawCode = String(suggestion.code || '').trim();
 
         // 检查是否为合法的3位数字状态码
         if (!/^\d{3}$/.test(rawCode) || !VALID_HTTP_CODES.has(rawCode)) {
-          console.warn(`非法HTTP状态码: ${rawCode}，已过滤`);
+          console.warn(`⚠️  建议 #${index + 1} 非法HTTP状态码: ${rawCode}，已过滤`);
           return null; // 标记为无效
         }
 
@@ -271,7 +295,7 @@ ${sanitizedInput}
 
         // 内容安全检查：过滤过长或包含恶意内容
         if (name.length > 100 || reason.length > 500) {
-          console.warn('建议内容过长，已过滤');
+          console.warn(`⚠️  建议 #${index + 1} 内容过长，已过滤 (name: ${name.length}, reason: ${reason.length})`);
           return null;
         }
 
@@ -288,21 +312,26 @@ ${sanitizedInput}
         // 确保在 1-5 范围内
         stars = Math.min(5, Math.max(1, stars));
 
+        console.log(`✅ 建议 #${index + 1} 验证通过: ${code} ${name} (${stars}⭐)`);
         return { code, name, reason, stars };
       }).filter((s: any) => s !== null); // 过滤掉无效项
 
+      console.log('📊 有效建议总数:', sanitizedSuggestions.length);
+
       // 确保至少有一个建议
       if (sanitizedSuggestions.length === 0) {
+        console.error('❌ 没有有效的建议');
         throw new Error('没有有效的建议');
       }
 
+      console.log('🎉 请求处理成功');
       return NextResponse.json({
         suggestions: sanitizedSuggestions,
       });
 
     } catch (parseError) {
-      console.error('解析LLM响应失败:', parseError);
-      console.error('原始响应:', responseText);
+      console.error('❌ 解析LLM响应失败:', parseError);
+      console.error('📄 原始响应:', responseText);
 
       return NextResponse.json(
         {
@@ -313,7 +342,8 @@ ${sanitizedInput}
     }
 
   } catch (error: any) {
-    console.error('API Error:', error);
+    console.error('❌ API Error:', error);
+    console.error('错误堆栈:', error.stack);
     return NextResponse.json(
       { error: error.message || '服务器内部错误' },
       { status: 500 }
