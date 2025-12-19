@@ -29,6 +29,22 @@
   ],
   "projects": [
     {
+      "title": "tool: 用HTTP状态码言简意赅地回答对方",
+      "link": "https://yukirin.me/tools/rfc-social",
+      "image": "https://yukirin.oss-cn-hangzhou.aliyuncs.com/me/image/20251219-191932-26708.png",
+      "imagePosition": "left",
+      "tags": [
+        { "name": "HTTP", "index": 5 },
+        { "name": "toy", "index": 7 },
+        { "name": "LLM", "index": 2 },
+        { "name": "日常社交", "index": 6 }
+      ],
+      "description": "基于 RFC 7231、WebDAV 和 Cloudflare 的 HTTP 社交辞令，让你的回复更加简洁有趣",
+      "comment": "没啥用但是挺好玩的",
+      "pin": true,
+      "sortId": 120
+    },
+    {
       "title": "demo: 一句 Prompt，让大模型不再千篇一律",
       "link": "https://yukirin.me/demo/verbalized-sampling",
       "image": "https://yukirin.oss-cn-hangzhou.aliyuncs.com/me/image/20251217-144617-10001.png",
