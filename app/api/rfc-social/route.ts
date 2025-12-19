@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
+import { detectMaliciousInput } from './security-config';
 
 // 合法的HTTP状态码白名单（基于 rfc-social-sfw.md）
 const VALID_HTTP_CODES = new Set([
@@ -120,6 +121,28 @@ export async function POST(request: Request) {
     }
 
     const sanitizedInput = userInput.trim().slice(0, 200);
+
+    // 安全检测：检查用户输入是否包含恶意内容
+    const securityCheck = detectMaliciousInput(sanitizedInput);
+    if (!securityCheck.safe) {
+      console.warn('检测到恶意输入:', {
+        input: sanitizedInput,
+        reason: securityCheck.reason,
+        matchedWords: securityCheck.matchedWords,
+      });
+
+      // 返回 400 Bad Request，并提供一个"幽默"的 HTTP 状态码响应
+      return NextResponse.json({
+        suggestions: [
+          {
+            code: '400',
+            name: 'Bad Request',
+            reason: '检测到疑似越狱指令，请正常描述你的社交情况',
+            stars: 1,
+          },
+        ],
+      });
+    }
 
     // 获取 RFC Social 提示词内容
     const rfcContent = await getRfcSocialContent();
@@ -250,9 +273,13 @@ ${sanitizedInput}
         throw new Error('没有有效的建议');
       }
 
+      // 仅在开发环境记录原始响应
+      if (process.env.NODE_ENV === 'development') {
+        console.log('LLM原始响应:', responseText);
+      }
+
       return NextResponse.json({
         suggestions: sanitizedSuggestions,
-        rawResponse: responseText
       });
 
     } catch (parseError) {
@@ -262,7 +289,6 @@ ${sanitizedInput}
       return NextResponse.json(
         {
           error: 'LLM返回格式有误，请重试',
-          rawResponse: responseText
         },
         { status: 500 }
       );

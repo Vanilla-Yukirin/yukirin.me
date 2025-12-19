@@ -13,7 +13,6 @@ interface Suggestion {
 
 interface ApiResponse {
   suggestions: Suggestion[];
-  rawResponse?: string;
 }
 
 export default function RfcSocialPage() {
