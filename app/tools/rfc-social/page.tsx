@@ -83,8 +83,15 @@ export default function RfcSocialPage() {
     }
   };
 
-  const renderStars = (stars: number) => {
-    return '⭐'.repeat(Math.min(5, Math.max(1, stars)));
+  const renderStars = (stars: number | undefined | null) => {
+    // 健壮的类型验证和转换
+    const numStars = typeof stars === 'number' && !isNaN(stars)
+      ? Math.floor(stars)
+      : 3; // 默认值
+
+    // 确保在 1-5 范围内
+    const validStars = Math.min(5, Math.max(1, numStars));
+    return '⭐'.repeat(validStars);
   };
 
   return (
