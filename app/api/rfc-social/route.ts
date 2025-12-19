@@ -67,7 +67,7 @@ async function getRfcSocialContent(): Promise<string> {
     return rfcSocialContent;
   }
 
-  const filePath = join(process.cwd(), 'app', 'demo', 'rfc-social', 'rfc-social-sfw.md');
+  const filePath = join(process.cwd(), 'app', 'api', 'rfc-social', 'rfc-social-sfw.md');
   rfcSocialContent = await readFile(filePath, 'utf-8');
   return rfcSocialContent;
 }
