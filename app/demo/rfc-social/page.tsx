@@ -215,9 +215,9 @@ export default function RfcSocialPage() {
           <p>2. 点击"翻译"按钮，LLM 会帮你找到最合适的 HTTP 响应码</p>
           <p>3. 每个推荐响应码都会显示推荐理由和星级评分</p>
           <p>4. 你可以选择最适合的响应码回复对方，十分简洁</p>
-          <p className={styles.tip}>
+          {/* <p className={styles.tip}>
             💡 小提示：HTTP 状态码本来是用于网络通信的，但用在日常对话中会让交流变得更加简洁幽默！
-          </p>
+          </p> */}
         </div>
       </section>
     </div>
