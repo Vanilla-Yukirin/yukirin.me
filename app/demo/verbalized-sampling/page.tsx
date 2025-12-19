@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CONFIG } from './config';
 import styles from './page.module.css';
 
@@ -14,6 +14,7 @@ interface ApiResponse {
   prompts: {
     stdSystemPrompt: string;
     vsSystemPrompt: string;
+    userPrompt: string;
   };
   distances: {
     stdIntra: number;
@@ -28,12 +29,24 @@ interface ApiResponse {
       std: [number, number];
       vs: [number, number];
     };
-    avgRadius2D: {
+    medRadius2D: {
       std: number;
       vs: number;
     };
   };
 }
+
+// 新增：分步状态接口
+interface StepStatus {
+  prompts: boolean;
+  stdComplete: boolean;
+  vsComplete: boolean;
+  embeddingComplete: boolean;
+  metricsComplete: boolean;
+}
+
+// 使用 Partial 类型来表示渐进式构建的结果，提高类型安全性
+type PartialApiResponse = Partial<ApiResponse>;
 
 export default function VerbalizedSamplingPage() {
   const [question, setQuestion] = useState('');
@@ -41,8 +54,30 @@ export default function VerbalizedSamplingPage() {
   const [k, setK] = useState(CONFIG.DEFAULT_K);
   const [model, setModel] = useState(CONFIG.DEFAULT_MODEL);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<ApiResponse | null>(null);
+  const [result, setResult] = useState<PartialApiResponse | null>(null);
   const [error, setError] = useState('');
+  
+  // 新增：分步状态
+  const [stepStatus, setStepStatus] = useState<StepStatus>({
+    prompts: false,
+    stdComplete: false,
+    vsComplete: false,
+    embeddingComplete: false,
+    metricsComplete: false,
+  });
+  const [loadingStep, setLoadingStep] = useState<string>('');
+  const [readerRef, setReaderRef] = useState<ReadableStreamDefaultReader<Uint8Array> | null>(null);
+
+  // 组件卸载时清理流资源
+  useEffect(() => {
+    return () => {
+      if (readerRef) {
+        readerRef.cancel().catch(() => {
+          // Ignore cleanup errors
+        });
+      }
+    };
+  }, [readerRef]);
 
   const handleSubmit = async () => {
     if (!question.trim()) {
@@ -53,6 +88,16 @@ export default function VerbalizedSamplingPage() {
     setLoading(true);
     setError('');
     setResult(null);
+    setStepStatus({
+      prompts: false,
+      stdComplete: false,
+      vsComplete: false,
+      embeddingComplete: false,
+      metricsComplete: false,
+    });
+    setLoadingStep('正在初始化...');
+
+    let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
 
     try {
       const response = await fetch('/api/verbalized-sampling', {
@@ -61,24 +106,176 @@ export default function VerbalizedSamplingPage() {
         body: JSON.stringify({ question, temperature, model, k }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.error || '请求失败');
+        // Try to extract error message from response body
+        let errorMsg = '请求失败';
+        try {
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const data = await response.json();
+            if (data && data.error) {
+              errorMsg = data.error;
+            }
+          } else {
+            const text = await response.text();
+            if (text) {
+              errorMsg = text;
+            }
+          }
+        } catch (e) {
+          // Ignore parsing errors, use default errorMsg
+        }
+        throw new Error(errorMsg);
       }
 
-      setResult(data);
+      reader = response.body?.getReader() || null;
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        throw new Error('无法读取响应流');
+      }
+
+      setReaderRef(reader);
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        
+        // 保留最后一行（可能不完整）
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const jsonStr = line.slice(6);
+            try {
+              const { step, data } = JSON.parse(jsonStr);
+
+              switch (step) {
+                case 'prompts':
+                  setStepStatus(prev => ({ ...prev, prompts: true }));
+                  setResult(prev => ({
+                    ...(prev || {}),
+                    prompts: data,
+                  }));
+                  setLoadingStep('正在生成标准方法回答...');
+                  break;
+
+                case 'std_complete':
+                  setStepStatus(prev => ({ ...prev, stdComplete: true }));
+                  setResult(prev => ({
+                    ...(prev || {}),
+                    stdResponses: data.responses,
+                    rawStdText: data.rawText,
+                  }));
+                  setLoadingStep('正在生成 Verbalized Sampling 回答...');
+                  break;
+
+                case 'vs_complete':
+                  setStepStatus(prev => ({ ...prev, vsComplete: true }));
+                  setResult(prev => ({
+                    ...(prev || {}),
+                    vsResponses: data.responses,
+                    rawVsText: data.rawText,
+                  }));
+                  setLoadingStep('正在计算 Embedding...');
+                  break;
+
+                case 'embedding_complete':
+                  setStepStatus(prev => ({ ...prev, embeddingComplete: true }));
+                  setLoadingStep('正在计算多样性指标...');
+                  break;
+
+                case 'metrics_complete':
+                  setStepStatus(prev => ({ ...prev, metricsComplete: true }));
+                  setResult(prev => ({
+                    ...(prev || {}),
+                    question: data.question,
+                    k: data.k,
+                    distances: data.distances,
+                    visualization: data.visualization,
+                  }));
+                  setLoadingStep('');
+                  setLoading(false); // 流处理完成后设置 loading 为 false
+                  break;
+
+                case 'error':
+                  throw new Error(data.message || '处理失败');
+              }
+            } catch (parseError) {
+              console.error('解析流数据失败:', parseError);
+              // 对于关键事件的解析失败，向用户显示错误
+              if (jsonStr.includes('metrics_complete')) {
+                setError('解析关键数据失败，请重试。');
+                setLoading(false);
+                setLoadingStep('');
+                reader?.cancel();
+                return;
+              }
+            }
+          }
+        }
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      // 清理 reader 资源
+      if (reader) {
+        try {
+          await reader.cancel();
+        } catch (e) {
+          // Ignore cleanup errors
+        }
+      }
+      setReaderRef(null);
+      // 只有在 loading 仍然为 true 时才重置（避免覆盖 metrics_complete 中的设置）
+      if (loading) {
+        setLoadingStep('');
+      }
     }
   };
 
-  const handleQuestionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleQuestionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     if (value.length <= CONFIG.MAX_QUESTION_LENGTH) {
       setQuestion(value);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      // Ctrl+Enter 手动插入换行符
+      if (e.ctrlKey) {
+        e.preventDefault();
+        const textarea = e.currentTarget;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const newValue = question.substring(0, start) + '\n' + question.substring(end);
+
+        if (newValue.length <= CONFIG.MAX_QUESTION_LENGTH) {
+          setQuestion(newValue);
+          // 在下一个事件循环中设置光标位置
+          setTimeout(() => {
+            textarea.selectionStart = textarea.selectionEnd = start + 1;
+          }, 0);
+        }
+        return;
+      }
+
+      // Shift+Enter 允许默认换行行为（浏览器自动处理）
+      if (e.shiftKey) {
+        return;
+      }
+
+      // 单独按 Enter 键时提交
+      if (!loading && question.trim()) {
+        e.preventDefault();
+        handleSubmit();
+      }
     }
   };
 
@@ -97,14 +294,47 @@ export default function VerbalizedSamplingPage() {
           <label className={styles.label}>
             问题 ({question.length}/{CONFIG.MAX_QUESTION_LENGTH})
           </label>
-          <input
-            type="text"
+          <textarea
             value={question}
             onChange={handleQuestionChange}
-            placeholder="输入你的问题（最多50字符）"
+            onKeyDown={handleKeyDown}
+            placeholder="输入你的问题（最多50字符，Ctrl+Enter 或 Shift+Enter 换行）"
             className={styles.input}
             disabled={loading}
+            rows={3}
           />
+        </div>
+
+        {/* 预设提示词按钮 */}
+        <div className={styles.presetButtons}>
+          <button
+            className={styles.presetButton}
+            onClick={() => setQuestion('给我一个减肥的有效方法')}
+            disabled={loading}
+          >
+            减肥方法
+          </button>
+          <button
+            className={styles.presetButton}
+            onClick={() => setQuestion('生成一道小学奥数题')}
+            disabled={loading}
+          >
+            小学奥数题
+          </button>
+          <button
+            className={styles.presetButton}
+            onClick={() => setQuestion('一句话描述一道ICPC算法题，已经抽象为数学问题，使用LaTeX语法，给出了清晰的数据范围。')}
+            disabled={loading}
+          >
+            ICPC算法题
+          </button>
+          <button
+            className={styles.presetButton}
+            onClick={() => setQuestion('讲一种数学建模竞赛中常用的模型')}
+            disabled={loading}
+          >
+            数学建模模型
+          </button>
         </div>
 
         <div className={styles.paramGroup}>
@@ -172,81 +402,135 @@ export default function VerbalizedSamplingPage() {
         </button>
 
         {error && <div className={styles.error}>{error}</div>}
+        
+        {/* 加载进度指示器 */}
+        {loading && loadingStep && (
+          <div className={styles.loadingIndicator}>
+            <div className={styles.spinner}></div>
+            <span>{loadingStep}</span>
+          </div>
+        )}
       </section>
 
       {/* 提示词对比 */}
-      {result && (
+      {result && result.prompts && (
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>系统提示词对比</h2>
+          <h2 className={styles.sectionTitle}>提示词对比</h2>
           <div className={styles.grid}>
             <div className={styles.gridItem}>
               <h3 className={styles.subtitle}>标准方法</h3>
-              <pre className={styles.code}>
-                {result.prompts.stdSystemPrompt}
-              </pre>
+              <div className={styles.promptGroup}>
+                <h4 className={styles.promptLabel}>System:</h4>
+                <pre className={styles.code}>
+                  {result.prompts.stdSystemPrompt}
+                </pre>
+              </div>
+              <div className={styles.promptGroup}>
+                <h4 className={styles.promptLabel}>User:</h4>
+                <pre className={styles.code}>
+                  {result.prompts.userPrompt}
+                </pre>
+              </div>
             </div>
             <div className={styles.gridItem}>
               <h3 className={styles.subtitle}>Verbalized Sampling</h3>
-              <pre className={styles.code}>
-                {result.prompts.vsSystemPrompt}
-              </pre>
+              <div className={styles.promptGroup}>
+                <h4 className={styles.promptLabel}>System:</h4>
+                <pre className={styles.code}>
+                  {result.prompts.vsSystemPrompt}
+                </pre>
+              </div>
+              <div className={styles.promptGroup}>
+                <h4 className={styles.promptLabel}>User:</h4>
+                <pre className={styles.code}>
+                  {result.prompts.userPrompt}
+                </pre>
+              </div>
             </div>
           </div>
         </section>
       )}
 
       {/* 原始响应 */}
-      {result && (
+      {result && (stepStatus.stdComplete || stepStatus.vsComplete) && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>原始响应</h2>
           <div className={styles.grid}>
             <div className={styles.gridItem}>
               <h3 className={styles.subtitle}>标准方法</h3>
-              <pre className={styles.rawResponse}>{result.rawStdText}</pre>
+              {stepStatus.stdComplete ? (
+                <pre className={styles.rawResponse}>{result.rawStdText}</pre>
+              ) : (
+                <div className={styles.loadingPlaceholder}>
+                  <div className={styles.spinner}></div>
+                  <span>正在生成...</span>
+                </div>
+              )}
             </div>
             <div className={styles.gridItem}>
               <h3 className={styles.subtitle}>Verbalized Sampling</h3>
-              <pre className={styles.rawResponse}>{result.rawVsText}</pre>
+              {stepStatus.vsComplete ? (
+                <pre className={styles.rawResponse}>{result.rawVsText}</pre>
+              ) : (
+                <div className={styles.loadingPlaceholder}>
+                  <div className={styles.spinner}></div>
+                  <span>正在生成...</span>
+                </div>
+              )}
             </div>
           </div>
         </section>
       )}
 
       {/* 提取后的回答列表 */}
-      {result && (
+      {result && (stepStatus.stdComplete || stepStatus.vsComplete) && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>提取的回答</h2>
           <div className={styles.grid}>
             <div className={styles.gridItem}>
               <h3 className={styles.subtitle}>
-                标准方法 ({result.stdResponses.length} 个回答)
+                标准方法 {stepStatus.stdComplete && result.stdResponses && `(${result.stdResponses.length} 个回答)`}
               </h3>
-              <ol className={styles.list}>
-                {result.stdResponses.map((resp, idx) => (
-                  <li key={idx} className={styles.listItem}>
-                    {resp}
-                  </li>
-                ))}
-              </ol>
+              {stepStatus.stdComplete && result.stdResponses ? (
+                <ol className={styles.list}>
+                  {result.stdResponses.map((resp, idx) => (
+                    <li key={idx} className={styles.listItem}>
+                      {resp}
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <div className={styles.loadingPlaceholder}>
+                  <div className={styles.spinner}></div>
+                  <span>正在生成...</span>
+                </div>
+              )}
             </div>
             <div className={styles.gridItem}>
               <h3 className={styles.subtitle}>
-                Verbalized Sampling ({result.vsResponses.length} 个回答)
+                Verbalized Sampling {stepStatus.vsComplete && result.vsResponses && `(${result.vsResponses.length} 个回答)`}
               </h3>
-              <ol className={styles.list}>
-                {result.vsResponses.map((resp, idx) => (
-                  <li key={idx} className={styles.listItem}>
-                    {resp}
-                  </li>
-                ))}
-              </ol>
+              {stepStatus.vsComplete && result.vsResponses ? (
+                <ol className={styles.list}>
+                  {result.vsResponses.map((resp, idx) => (
+                    <li key={idx} className={styles.listItem}>
+                      {resp}
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <div className={styles.loadingPlaceholder}>
+                  <div className={styles.spinner}></div>
+                  <span>正在生成...</span>
+                </div>
+              )}
             </div>
           </div>
         </section>
       )}
 
       {/* 指标数据 */}
-      {result && (
+      {result && stepStatus.metricsComplete && result.distances && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>多样性指标</h2>
           <div className={styles.metricsLayout}>
@@ -281,7 +565,7 @@ export default function VerbalizedSamplingPage() {
               <h3 className={styles.subtitle}>指标说明</h3>
               <ul className={styles.explanationList}>
                 <li>
-                  <strong>类内平均距离</strong>: 同组内{result.k}个回答之间的平均余弦距离，
+                  <strong>类内平均距离</strong>: 同组内{result.k || k}个回答之间的平均余弦距离，
                   <span className={styles.highlight}>值越大表示多样性越高</span>
                 </li>
                 <li>
@@ -313,7 +597,7 @@ export default function VerbalizedSamplingPage() {
       )}
       
       {/* 2D可视化 */}
-      {result && (
+      {result && stepStatus.metricsComplete && result.visualization && result.k && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>PCA 降维可视化 (2D)</h2>
           <div className={styles.visualization}>
@@ -347,7 +631,8 @@ export default function VerbalizedSamplingPage() {
 
               {/* 计算合适的缩放比例 */}
               {(() => {
-                const allPoints = result.visualization.embedding2D;
+                const allPoints = result.visualization!.embedding2D;
+                const k = result.k!;
                 const xValues = allPoints.map(p => p[0]);
                 const yValues = allPoints.map(p => p[1]);
                 const maxX = Math.max(...xValues.map(Math.abs));
@@ -357,7 +642,7 @@ export default function VerbalizedSamplingPage() {
                 return (
                   <>
                     {/* 标准方法的点（蓝色） */}
-                    {allPoints.slice(0, result.k).map((point, idx) => (
+                    {allPoints.slice(0, k).map((point, idx) => (
                       <g key={`std-${idx}`}>
                         <circle
                           cx={point[0] * scale + 300}
@@ -381,7 +666,7 @@ export default function VerbalizedSamplingPage() {
                     ))}
 
                     {/* VS方法的点（红色） */}
-                    {allPoints.slice(result.k, result.k * 2).map((point, idx) => (
+                    {allPoints.slice(k, k * 2).map((point, idx) => (
                       <g key={`vs-${idx}`}>
                         <circle
                           cx={point[0] * scale + 300}
@@ -406,9 +691,9 @@ export default function VerbalizedSamplingPage() {
 
                     {/* 标准方法的范围圆（虚线） */}
                     <circle
-                      cx={result.visualization.centroids2D.std[0] * scale + 300}
-                      cy={-result.visualization.centroids2D.std[1] * scale + 200}
-                      r={result.visualization.avgRadius2D.std * scale}
+                      cx={result.visualization!.centroids2D!.std[0] * scale + 300}
+                      cy={-result.visualization!.centroids2D!.std[1] * scale + 200}
+                      r={result.visualization!.medRadius2D!.std * scale}
                       fill="none"
                       stroke="#3b82f6"
                       strokeWidth="2"
@@ -418,9 +703,9 @@ export default function VerbalizedSamplingPage() {
 
                     {/* VS方法的范围圆（虚线） */}
                     <circle
-                      cx={result.visualization.centroids2D.vs[0] * scale + 300}
-                      cy={-result.visualization.centroids2D.vs[1] * scale + 200}
-                      r={result.visualization.avgRadius2D.vs * scale}
+                      cx={result.visualization!.centroids2D!.vs[0] * scale + 300}
+                      cy={-result.visualization!.centroids2D!.vs[1] * scale + 200}
+                      r={result.visualization!.medRadius2D!.vs * scale}
                       fill="none"
                       stroke="#ef4444"
                       strokeWidth="2"
@@ -430,8 +715,8 @@ export default function VerbalizedSamplingPage() {
 
                     {/* 标准方法的质心（空心） */}
                     <circle
-                      cx={result.visualization.centroids2D.std[0] * scale + 300}
-                      cy={-result.visualization.centroids2D.std[1] * scale + 200}
+                      cx={result.visualization!.centroids2D!.std[0] * scale + 300}
+                      cy={-result.visualization!.centroids2D!.std[1] * scale + 200}
                       r="8"
                       fill="white"
                       stroke="#3b82f6"
@@ -439,8 +724,8 @@ export default function VerbalizedSamplingPage() {
                       opacity="0.9"
                     />
                     <text
-                      x={result.visualization.centroids2D.std[0] * scale + 300}
-                      y={-result.visualization.centroids2D.std[1] * scale + 200 - 15}
+                      x={result.visualization!.centroids2D!.std[0] * scale + 300}
+                      y={-result.visualization!.centroids2D!.std[1] * scale + 200 - 15}
                       fontSize="12"
                       fill="#1e40af"
                       textAnchor="middle"
@@ -451,8 +736,8 @@ export default function VerbalizedSamplingPage() {
 
                     {/* VS方法的质心（空心） */}
                     <circle
-                      cx={result.visualization.centroids2D.vs[0] * scale + 300}
-                      cy={-result.visualization.centroids2D.vs[1] * scale + 200}
+                      cx={result.visualization!.centroids2D!.vs[0] * scale + 300}
+                      cy={-result.visualization!.centroids2D!.vs[1] * scale + 200}
                       r="8"
                       fill="white"
                       stroke="#ef4444"
@@ -460,8 +745,8 @@ export default function VerbalizedSamplingPage() {
                       opacity="0.9"
                     />
                     <text
-                      x={result.visualization.centroids2D.vs[0] * scale + 300}
-                      y={-result.visualization.centroids2D.vs[1] * scale + 200 - 15}
+                      x={result.visualization!.centroids2D!.vs[0] * scale + 300}
+                      y={-result.visualization!.centroids2D!.vs[1] * scale + 200 - 15}
                       fontSize="12"
                       fill="#991b1b"
                       textAnchor="middle"
@@ -476,11 +761,11 @@ export default function VerbalizedSamplingPage() {
             <div className={styles.legend}>
               <div className={styles.legendItem}>
                 <span className={styles.legendDot} style={{ backgroundColor: '#3b82f6' }}></span>
-                <span>标准方法 (S1-S{result.k})</span>
+                <span>标准方法 (S1-S{result.k!})</span>
               </div>
               <div className={styles.legendItem}>
                 <span className={styles.legendDot} style={{ backgroundColor: '#ef4444' }}></span>
-                <span>Verbalized Sampling (V1-V{result.k})</span>
+                <span>Verbalized Sampling (V1-V{result.k!})</span>
               </div>
               <div className={styles.legendItem}>
                 <span className={styles.legendDot} style={{ backgroundColor: 'white', border: '2px solid #64748b' }}></span>
