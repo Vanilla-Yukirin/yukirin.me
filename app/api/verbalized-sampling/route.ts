@@ -2,19 +2,68 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { PCA } from 'ml-pca';
 
-//初始化 llm & emb客户端（延迟初始化以避免构建时错误）
-let llm: OpenAI | null = null;
-let emb: OpenAI | null = null;
-
-function getLLMClient() {
-  if (!llm) {
-    llm = new OpenAI({
-      apiKey: process.env.SHENGSUAN_API_KEY,
-      baseURL: process.env.SHENGSUAN_BASE_URL,
-    });
-  }
-  return llm;
+// 模型配置接口
+interface ModelConfig {
+  API: string;
+  model: string;
 }
+
+// LLM 客户端缓存
+const llmClients: Record<string, OpenAI> = {};
+
+// 根据 API 提供商获取 LLM 客户端
+function getLLMClient(apiProvider: string): OpenAI {
+  // 标准化为大写以确保缓存一致性
+  const normalizedProvider = apiProvider.toUpperCase();
+
+  // 如果已缓存，直接返回
+  if (llmClients[normalizedProvider]) {
+    return llmClients[normalizedProvider];
+  }
+
+  // 根据 API 提供商选择对应的环境变量
+  let apiKey: string | undefined;
+  let baseURL: string | undefined;
+
+  switch (normalizedProvider) {
+    case 'SILICONFLOW':
+      apiKey = process.env.SILICONFLOW_API_KEY;
+      baseURL = process.env.SILICONFLOW_BASE_URL;
+      break;
+    case 'SHENGSUAN':
+      apiKey = process.env.SHENGSUAN_API_KEY;
+      baseURL = process.env.SHENGSUAN_BASE_URL;
+      break;
+    case 'XIAOHUMI':
+      apiKey = process.env.XIAOHUMI_API_KEY;
+      baseURL = process.env.XIAOHUMI_BASE_URL;
+      break;
+    case 'OPENAIHK':
+      apiKey = process.env.OPENAIHK_API_KEY;
+      baseURL = process.env.OPENAIHK_BASE_URL;
+      break;
+    default:
+      throw new Error(
+        `Unsupported API provider: ${apiProvider}. ` +
+        `Supported providers: SILICONFLOW, SHENGSUAN, XIAOHUMI, OPENAIHK`
+      );
+  }
+
+  if (!apiKey || !baseURL) {
+    throw new Error(`Missing API key or base URL for provider: ${apiProvider}`);
+  }
+
+  // 创建并缓存客户端（使用标准化的 key）
+  llmClients[normalizedProvider] = new OpenAI({
+    apiKey,
+    baseURL,
+  });
+
+  return llmClients[normalizedProvider];
+}
+
+// Embedding 客户端（固定使用 SILICONFLOW）
+let emb: OpenAI | null = null;
 
 function getEmbClient() {
   if (!emb) {
@@ -154,6 +203,19 @@ export async function POST(request: Request) {
         //1. 接受用户的问题和参数
         const body = await request.json();
         const { question, temperature = 1.5, model, k = 5 } = body;
+
+        // 解析模型配置
+        const modelConfig: ModelConfig = typeof model === 'string'
+            ? JSON.parse(model)
+            : model;
+
+        // 验证模型配置
+        if (!modelConfig || !modelConfig.API || !modelConfig.model) {
+            return NextResponse.json(
+                { error: '无效的模型配置' },
+                { status: 400 }
+            );
+        }
         
         //2. 验证输入的长度
         if (!question || typeof question !== 'string') {
@@ -219,12 +281,14 @@ export async function POST(request: Request) {
 
                     //4. 并行调用LLM - 标准方法和VS方法
                     console.log("开始并行生成标准回答和Verbalized Sampling回答...");
-                    const llmClient = getLLMClient();
-                    
+                    console.log("使用模型配置:", modelConfig);
+
+                    const llmClient = getLLMClient(modelConfig.API);
+
                     // 并行执行两个LLM调用以减少总等待时间
                     const [stdCompletion, vsCompletion] = await Promise.all([
                         llmClient.chat.completions.create({
-                            model: model,
+                            model: modelConfig.model,
                             messages: [
                                 { role: 'system', content: stdSystemPrompt },
                                 { role: 'user', content: sanitizedQuestion }
@@ -234,7 +298,7 @@ export async function POST(request: Request) {
                             enable_thinking: false,
                         } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming),
                         llmClient.chat.completions.create({
-                            model: model,
+                            model: modelConfig.model,
                             messages: [
                                 { role: 'system', content: vsSystemPrompt },
                                 { role: 'user', content: sanitizedQuestion }
