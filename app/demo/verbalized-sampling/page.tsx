@@ -14,6 +14,7 @@ interface ApiResponse {
   prompts: {
     stdSystemPrompt: string;
     vsSystemPrompt: string;
+    userPrompt: string;
   };
   distances: {
     stdIntra: number;
@@ -304,6 +305,38 @@ export default function VerbalizedSamplingPage() {
           />
         </div>
 
+        {/* 预设提示词按钮 */}
+        <div className={styles.presetButtons}>
+          <button
+            className={styles.presetButton}
+            onClick={() => setQuestion('给我一个减肥的有效方法')}
+            disabled={loading}
+          >
+            减肥方法
+          </button>
+          <button
+            className={styles.presetButton}
+            onClick={() => setQuestion('生成一道小学奥数题')}
+            disabled={loading}
+          >
+            小学奥数题
+          </button>
+          <button
+            className={styles.presetButton}
+            onClick={() => setQuestion('一句话描述一道ICPC算法题，已经抽象为数学问题，使用LaTeX语法，给出了清晰的数据范围。')}
+            disabled={loading}
+          >
+            ICPC算法题
+          </button>
+          <button
+            className={styles.presetButton}
+            onClick={() => setQuestion('讲一种数学建模竞赛中常用的模型')}
+            disabled={loading}
+          >
+            数学建模模型
+          </button>
+        </div>
+
         <div className={styles.paramGroup}>
           <div className={styles.param}>
             <label className={styles.label}>
@@ -382,19 +415,37 @@ export default function VerbalizedSamplingPage() {
       {/* 提示词对比 */}
       {result && result.prompts && (
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>系统提示词对比</h2>
+          <h2 className={styles.sectionTitle}>提示词对比</h2>
           <div className={styles.grid}>
             <div className={styles.gridItem}>
               <h3 className={styles.subtitle}>标准方法</h3>
-              <pre className={styles.code}>
-                {result.prompts.stdSystemPrompt}
-              </pre>
+              <div className={styles.promptGroup}>
+                <h4 className={styles.promptLabel}>System:</h4>
+                <pre className={styles.code}>
+                  {result.prompts.stdSystemPrompt}
+                </pre>
+              </div>
+              <div className={styles.promptGroup}>
+                <h4 className={styles.promptLabel}>User:</h4>
+                <pre className={styles.code}>
+                  {result.prompts.userPrompt}
+                </pre>
+              </div>
             </div>
             <div className={styles.gridItem}>
               <h3 className={styles.subtitle}>Verbalized Sampling</h3>
-              <pre className={styles.code}>
-                {result.prompts.vsSystemPrompt}
-              </pre>
+              <div className={styles.promptGroup}>
+                <h4 className={styles.promptLabel}>System:</h4>
+                <pre className={styles.code}>
+                  {result.prompts.vsSystemPrompt}
+                </pre>
+              </div>
+              <div className={styles.promptGroup}>
+                <h4 className={styles.promptLabel}>User:</h4>
+                <pre className={styles.code}>
+                  {result.prompts.userPrompt}
+                </pre>
+              </div>
             </div>
           </div>
         </section>

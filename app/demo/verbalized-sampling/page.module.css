@@ -75,6 +75,36 @@ textarea.input {
   cursor: not-allowed;
 }
 
+/* 预设提示词按钮区域 */
+.presetButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.presetButton {
+  padding: 0.5rem 1rem;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.presetButton:hover:not(:disabled) {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+.presetButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .paramGroup {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -240,6 +270,22 @@ textarea.input {
   overflow-x: auto;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+/* 提示词组 */
+.promptGroup {
+  margin-bottom: 1rem;
+}
+
+.promptGroup:last-child {
+  margin-bottom: 0;
+}
+
+.promptLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 0.5rem 0;
 }
 
 .rawResponse {

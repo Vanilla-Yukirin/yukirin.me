@@ -210,10 +210,11 @@ export async function POST(request: Request) {
                     const stdSystemPrompt = `${stdSystemPromptbase}\n\n${formatInstruction}`;
                     const vsSystemPrompt = `${vsSystemPromptbase}\n\n${formatInstruction}`;
 
-                    // 发送提示词信息
+                    // 发送提示词信息(包含系统提示词和用户提示词)
                     sendEvent('prompts', {
                         stdSystemPrompt,
                         vsSystemPrompt,
+                        userPrompt: sanitizedQuestion,
                     });
 
                     //4. 并行调用LLM - 标准方法和VS方法
