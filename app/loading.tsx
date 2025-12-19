@@ -10,7 +10,7 @@ export default function Loading() {
     <div className={styles.loader} aria-busy="true" aria-live="polite">
       <div className={styles.wrap}>
         <div className={styles.ring}></div>
-        <img src="images/load.png" alt="loading" className={styles.image} />
+        <img src="/images/load.png" alt="loading" className={styles.image} />
       </div>
     </div>
   );

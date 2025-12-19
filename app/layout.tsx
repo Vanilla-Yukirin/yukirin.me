@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   authors: [{ name: 'Vanilla Yukirin' }],
   creator: 'Vanilla Yukirin',
   icons: {
-    icon: 'images/favicon.png',
+    icon: '/images/favicon.png',
   },
 };
 
