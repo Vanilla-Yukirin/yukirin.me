@@ -211,7 +211,9 @@ ${sanitizedInput}
       ],
       temperature: 0.2,
       max_tokens: 1000,
-      enable_thinking: true,
+      // enable_thinking: true,
+      // 如果用30B-A3B-Instruct-2507，不需要管think
+      // 如果用30B-A3B-Thinking-2507，也无需enable_thinking=true
       thinking_budget: 240,
     } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
 
