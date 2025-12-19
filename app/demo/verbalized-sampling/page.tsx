@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CONFIG } from './config';
+import { CONFIG, ModelConfig } from './config';
 import styles from './page.module.css';
 
 interface ApiResponse {
@@ -52,7 +52,7 @@ export default function VerbalizedSamplingPage() {
   const [question, setQuestion] = useState('');
   const [temperature, setTemperature] = useState(CONFIG.DEFAULT_TEMPERATURE);
   const [k, setK] = useState(CONFIG.DEFAULT_K);
-  const [model, setModel] = useState(CONFIG.DEFAULT_MODEL);
+  const [model, setModel] = useState<ModelConfig>(CONFIG.DEFAULT_MODEL);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<PartialApiResponse | null>(null);
   const [error, setError] = useState('');
@@ -379,13 +379,13 @@ export default function VerbalizedSamplingPage() {
           <div className={styles.param}>
             <label className={styles.label}>模型</label>
             <select
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
+              value={JSON.stringify(model)}
+              onChange={(e) => setModel(JSON.parse(e.target.value))}
               className={styles.select}
               disabled={loading}
             >
-              {CONFIG.LLM_MODELS.map((m) => (
-                <option key={m.value} value={m.value}>
+              {CONFIG.LLM_MODELS.map((m, idx) => (
+                <option key={idx} value={JSON.stringify(m.value)}>
                   {m.label}
                 </option>
               ))}

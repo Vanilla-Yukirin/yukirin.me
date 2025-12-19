@@ -1,3 +1,9 @@
+// 模型配置类型
+export interface ModelConfig {
+  API: string;
+  model: string;
+}
+
 // 共享配置常量
 export const CONFIG = {
   MAX_QUESTION_LENGTH: 50,           // 问题最大长度
@@ -12,13 +18,13 @@ export const CONFIG = {
 
   // 可用的 LLM 模型
   LLM_MODELS: [
-    { value: 'gpt-5-nano', label: 'GPT-5 Nano' },
-    { value: 'gpt-5-mini', label: 'GPT-5 Mini' },
-    // { value: 'Qwen/Qwen3-8B', label: 'Qwen3-8B' },
-    // { value: 'Qwen/Qwen3-30B-A3B-Instruct-2507', label: 'Qwen3-30B-A3B-Instruct-2507' },
-    // { value: 'Qwen/Qwen3-Next-80B-A3B-Instruct', label: 'Qwen3-Next-80B-A3B-Instruct' },
-    // { value: 'deepseek-ai/DeepSeek-V3', label: 'DeepSeek-V3' },
-    // { value: 'deepseek-ai/DeepSeek-V3.2', label: 'DeepSeek-V3.2(no thinking)' },
+    { value: {"API": "OPENAIHK","model": "gpt-5-nano"}, label: 'GPT-5 Nano' },
+    { value: {"API": "OPENAIHK","model": "gpt-5-mini"}, label: 'GPT-5 Mini' },
+    { value: {"API": "SILICONFLOW","model": "Qwen/Qwen3-8B"}, label: 'Qwen3-8B' },
+    { value: {"API": "SILICONFLOW","model": "Qwen/Qwen3-30B-A3B-Instruct-2507"}, label: 'Qwen3-30B-A3B-Instruct-2507' },
+    { value: {"API": "SILICONFLOW","model": "Qwen/Qwen3-Next-80B-A3B-Instruct"}, label: 'Qwen3-Next-80B-A3B-Instruct' },
+    { value: {"API": "SILICONFLOW","model": "deepseek-ai/DeepSeek-V3"}, label: 'DeepSeek-V3' },
+    { value: {"API": "SILICONFLOW","model": "deepseek-ai/DeepSeek-V3.2"}, label: 'DeepSeek-V3.2(no thinking)' },
   ],
-  DEFAULT_MODEL: 'gpt-5-mini',
+  DEFAULT_MODEL: {"API": "OPENAIHK","model": "gpt-5-nano"},
 };
