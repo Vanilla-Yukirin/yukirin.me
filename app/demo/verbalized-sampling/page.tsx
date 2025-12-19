@@ -238,10 +238,43 @@ export default function VerbalizedSamplingPage() {
     }
   };
 
-  const handleQuestionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleQuestionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     if (value.length <= CONFIG.MAX_QUESTION_LENGTH) {
       setQuestion(value);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      // Ctrl+Enter 手动插入换行符
+      if (e.ctrlKey) {
+        e.preventDefault();
+        const textarea = e.currentTarget;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const newValue = question.substring(0, start) + '\n' + question.substring(end);
+
+        if (newValue.length <= CONFIG.MAX_QUESTION_LENGTH) {
+          setQuestion(newValue);
+          // 在下一个事件循环中设置光标位置
+          setTimeout(() => {
+            textarea.selectionStart = textarea.selectionEnd = start + 1;
+          }, 0);
+        }
+        return;
+      }
+
+      // Shift+Enter 允许默认换行行为（浏览器自动处理）
+      if (e.shiftKey) {
+        return;
+      }
+
+      // 单独按 Enter 键时提交
+      if (!loading && question.trim()) {
+        e.preventDefault();
+        handleSubmit();
+      }
     }
   };
 
@@ -260,13 +293,14 @@ export default function VerbalizedSamplingPage() {
           <label className={styles.label}>
             问题 ({question.length}/{CONFIG.MAX_QUESTION_LENGTH})
           </label>
-          <input
-            type="text"
+          <textarea
             value={question}
             onChange={handleQuestionChange}
-            placeholder="输入你的问题（最多50字符）"
+            onKeyDown={handleKeyDown}
+            placeholder="输入你的问题（最多50字符，Ctrl+Enter 或 Shift+Enter 换行）"
             className={styles.input}
             disabled={loading}
+            rows={3}
           />
         </div>
 

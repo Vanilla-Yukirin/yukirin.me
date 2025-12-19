@@ -56,6 +56,12 @@
   border-radius: 4px;
   font-size: 1rem;
   font-family: inherit;
+  resize: vertical;
+  min-height: 2.5rem;
+}
+
+textarea.input {
+  line-height: 1.5;
 }
 
 .input:focus {
