@@ -156,18 +156,26 @@ ${rfcContent}
       ],
       temperature: 0.8,
       max_tokens: 1000,
-      enable_thinking: false,
+      // enable_thinking: false,
     } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
 
     const responseText = completion.choices[0]?.message?.content || '';
-    
+
     // 解析 JSON 响应
     try {
-      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      // 首先尝试去除 markdown 代码块标记
+      let cleanedText = responseText.trim();
+
+      // 移除 ```json 和 ``` 标记
+      cleanedText = cleanedText.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
+
+      // 尝试提取JSON对象
+      const jsonMatch = cleanedText.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
+        console.error('无法提取JSON，原始响应为:', responseText);
         throw new Error('无法从响应中提取JSON');
       }
-      
+
       const result = JSON.parse(jsonMatch[0]);
       
       // 验证响应格式

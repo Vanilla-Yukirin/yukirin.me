@@ -115,10 +115,10 @@ export default function RfcSocialPage() {
           </button>
           <button
             className={styles.presetButton}
-            onClick={() => setUserInput('老板让我加班')}
+            onClick={() => setUserInput('导师让我读文献')}
             disabled={loading}
           >
-            老板让我加班
+            导师让我读文献
           </button>
           <button
             className={styles.presetButton}
@@ -189,9 +189,9 @@ export default function RfcSocialPage() {
         <h2 className={styles.sectionTitle}>使用说明</h2>
         <div className={styles.instructions}>
           <p>1. 在输入框中描述你遇到的情况或想要表达的意思</p>
-          <p>2. 点击"翻译"按钮，AI 会帮你找到最合适的 HTTP 响应码</p>
-          <p>3. 每个推荐都会显示推荐理由和星级评分</p>
-          <p>4. 选择最适合的响应码回复对方，简洁又有趣</p>
+          <p>2. 点击"翻译"按钮，LLM 会帮你找到最合适的 HTTP 响应码</p>
+          <p>3. 每个推荐响应码都会显示推荐理由和星级评分</p>
+          <p>4. 你可以选择最适合的响应码回复对方，十分简洁</p>
           <p className={styles.tip}>
             💡 小提示：HTTP 状态码本来是用于网络通信的，但用在日常对话中会让交流变得更加简洁幽默！
           </p>
