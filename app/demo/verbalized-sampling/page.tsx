@@ -380,7 +380,15 @@ export default function VerbalizedSamplingPage() {
             <label className={styles.label}>模型</label>
             <select
               value={JSON.stringify(model)}
-              onChange={(e) => setModel(JSON.parse(e.target.value))}
+              onChange={(e) => {
+                const { value } = e.target;
+                try {
+                  const parsed = JSON.parse(value);
+                  setModel(parsed);
+                } catch {
+                  // Ignore invalid JSON value to prevent uncaught exceptions
+                }
+              }}
               className={styles.select}
               disabled={loading}
             >
