@@ -160,23 +160,26 @@ export function detectMaliciousInput(input: string): {
 
   // 第2层：中等信号检测（需要组合判定）
   const matchedMedium: string[] = [];
-  for (const signal of MEDIUM_SIGNALS) {
-    if (lowerInput.includes(signal.toLowerCase())) {
-      matchedMedium.push(signal);
+  const lowerMediumSignals = MEDIUM_SIGNALS.map(signal => signal.toLowerCase());
+  for (let i = 0; i < MEDIUM_SIGNALS.length; i++) {
+    if (lowerInput.includes(lowerMediumSignals[i])) {
+      matchedMedium.push(MEDIUM_SIGNALS[i]);
     }
   }
 
   // 第3层：弱信号检测
   const matchedWeak: string[] = [];
-  for (const signal of WEAK_SIGNALS) {
-    if (lowerInput.includes(signal.toLowerCase())) {
-      matchedWeak.push(signal);
+  const lowerWeakSignals = WEAK_SIGNALS.map(signal => signal.toLowerCase());
+  for (let i = 0; i < WEAK_SIGNALS.length; i++) {
+    if (lowerInput.includes(lowerWeakSignals[i])) {
+      matchedWeak.push(WEAK_SIGNALS[i]);
     }
   }
 
   // 检测指令动词
-  const hasCommandVerb = COMMAND_VERBS.some(verb =>
-    lowerInput.includes(verb.toLowerCase())
+  const lowerCommandVerbs = COMMAND_VERBS.map(verb => verb.toLowerCase());
+  const hasCommandVerb = lowerCommandVerbs.some(lowerVerb =>
+    lowerInput.includes(lowerVerb)
   );
 
   // 组合判定规则
