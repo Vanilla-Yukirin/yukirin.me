@@ -31,8 +31,8 @@ export const config = {
      * - api (API 路由)
      * - _next/static (静态文件)
      * - _next/image (图片优化文件)
-     * - favicon.ico (网站图标)
+     * - favicon (网站图标，支持所有格式)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon).*)',
   ],
 };

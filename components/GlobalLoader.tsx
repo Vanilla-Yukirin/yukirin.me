@@ -89,7 +89,7 @@ export default function GlobalLoader() {
     <div className={`${styles.loader} ${fadeOut ? styles.fadeOut : ''}`} aria-busy="true" aria-live="polite">
       <div className={styles.wrap}>
         <div className={styles.ring} />
-        <img src="/load.png" alt="loading" className={styles.image} />
+        <img src="images/load.png" alt="loading" className={styles.image} />
       </div>
       <p className={styles.text}>Loading...</p>
     </div>

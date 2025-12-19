@@ -27,7 +27,7 @@ function getEmbClient() {
 }
 
 //统一设置模型
-const llmModel = 'openai/gpt-5-mini';
+// const llmModel = 'gpt-5-mini';
 const embModel = 'Qwen/Qwen3-Embedding-0.6B';
 
 function parseResponses(text: string, k: number): string[] {
@@ -153,7 +153,7 @@ export async function POST(request: Request) {
         
         //1. 接受用户的问题和参数
         const body = await request.json();
-        const { question, temperature = 1.5, model = llmModel, k = 5 } = body;
+        const { question, temperature = 1.5, model, k = 5 } = body;
         
         //2. 验证输入的长度
         if (!question || typeof question !== 'string') {
