@@ -385,7 +385,7 @@ export default function VerbalizedSamplingPage() {
               disabled={loading}
             >
               {CONFIG.LLM_MODELS.map((m, idx) => (
-                <option key={idx} value={JSON.stringify(m.value)}>
+                <option key={JSON.stringify(m.value)} value={JSON.stringify(m.value)}>
                   {m.label}
                 </option>
               ))}
