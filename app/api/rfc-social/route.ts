@@ -202,7 +202,7 @@ ${sanitizedInput}
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
       ],
-      temperature: 0.8,
+      temperature: 0.2,
       max_tokens: 1000,
       // enable_thinking: false,
     } as OpenAI.Chat.ChatCompletionCreateParamsNonStreaming);
