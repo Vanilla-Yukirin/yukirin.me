@@ -13,16 +13,19 @@ const llmClients: Record<string, OpenAI> = {};
 
 // 根据 API 提供商获取 LLM 客户端
 function getLLMClient(apiProvider: string): OpenAI {
+  // 标准化为大写以确保缓存一致性
+  const normalizedProvider = apiProvider.toUpperCase();
+
   // 如果已缓存，直接返回
-  if (llmClients[apiProvider]) {
-    return llmClients[apiProvider];
+  if (llmClients[normalizedProvider]) {
+    return llmClients[normalizedProvider];
   }
 
   // 根据 API 提供商选择对应的环境变量
   let apiKey: string | undefined;
   let baseURL: string | undefined;
 
-  switch (apiProvider.toUpperCase()) {
+  switch (normalizedProvider) {
     case 'SILICONFLOW':
       apiKey = process.env.SILICONFLOW_API_KEY;
       baseURL = process.env.SILICONFLOW_BASE_URL;
@@ -40,20 +43,23 @@ function getLLMClient(apiProvider: string): OpenAI {
       baseURL = process.env.OPENAIHK_BASE_URL;
       break;
     default:
-      throw new Error(`Unsupported API provider: ${apiProvider}`);
+      throw new Error(
+        `Unsupported API provider: ${apiProvider}. ` +
+        `Supported providers: SILICONFLOW, SHENGSUAN, XIAOHUMI, OPENAIHK`
+      );
   }
 
   if (!apiKey || !baseURL) {
     throw new Error(`Missing API key or base URL for provider: ${apiProvider}`);
   }
 
-  // 创建并缓存客户端
-  llmClients[apiProvider] = new OpenAI({
+  // 创建并缓存客户端（使用标准化的 key）
+  llmClients[normalizedProvider] = new OpenAI({
     apiKey,
     baseURL,
   });
 
-  return llmClients[apiProvider];
+  return llmClients[normalizedProvider];
 }
 
 // Embedding 客户端（固定使用 SILICONFLOW）
