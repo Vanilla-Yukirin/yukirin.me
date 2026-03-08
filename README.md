@@ -187,4 +187,4 @@ ISC License
 
 ---
 
-© 2025 Vanilla Yukirin · 永远可爱 · 永远善良
+© 2026 Vanilla Yukirin · 永远可爱 · 永远善良
