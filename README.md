@@ -188,3 +188,7 @@ ISC License
 ---
 
 © 2025 Vanilla Yukirin · 永远可爱 · 永远善良
+
+
+# Test from NekoSetsuna 🐱❄️
+Token 权限测试成功！
