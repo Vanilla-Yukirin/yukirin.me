@@ -82,6 +82,7 @@ export interface Paper {
   title: string;
   author: string;
   venue: string;
+  link?: string;
 }
 
 /**

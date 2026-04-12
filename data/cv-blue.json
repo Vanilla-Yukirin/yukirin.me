@@ -6,45 +6,77 @@
       "🎓 27届毕业生 · 大三在读",
       "🏫 某普通一本大学 · 理学院",
       "💻 数据科学与大数据技术专业",
-      "🌱 蒟蒻 · 还在学习中"
+      "🏆 两次省政府奖学金 · 若干次一等奖学金"
     ]
   },
   "achievements": [
-    "🥈 ICPC 国际大学生程序设计竞赛区域赛银奖",
-    "🏆 全国大学生数学建模竞赛国家二等奖（2次）",
-    "🥈 浙江省第二十二届大学生程序设计竞赛银奖",
-    "🥇 统计建模竞赛浙江省一等奖（2次）"
+    "🥉 ICPC 亚洲区总决赛 EC-Final 铜奖（2026杭州）",
+    "🥈 ICPC 国际大学生程序设计竞赛区域赛银奖（2024上海&2025武汉）",
+    "🏆 全国大学生数学建模竞赛国家二等奖",
+    "🥈 浙江省第二十二届大学生程序设计竞赛银奖（2025）",
+    "🏆 团体程序设计天梯赛全国总决赛团队一等奖（2024&2025）",
+    "🥈 蓝桥杯 C/C++ 程序设计大学 B 组全国二等奖（2025）",
+    "🏆 国际大学生数学建模竞赛 H 奖（2025）",
+    "🥇 全国大学生统计建模大赛浙江赛区一等奖（2024&2025）",
+    "🥇 长三角数学建模竞赛浙江赛区一等奖（2024）",
+    "🏆 全国青少年信息学奥林匹克联赛 NOIP 一等奖（2020）"
   ],
   "projects": [
     {
+      "title": "基于 FunASR-nano 的动漫音频垂直领域语音识别微调",
+      "period": "2025.12 - 至今",
+      "description": "独立负责 5000+ 小时多源数据集清洗构建与多阶段微调方案设计，通过热词注入与强化对齐有效抑制模型幻觉",
+      "tags": [
+        "ASR",
+        "LLM",
+        "SFT",
+        "GRPO",
+        "DPO",
+        "热词注入"
+      ]
+    },
+    {
       "title": "基于ResViTM的CT图像肺结核识别",
       "period": "2025.4 - 2025.8",
-      "description": "设计ResViTM融合架构（ResNet+ViT+Meta），在4999份样本上达到96.0%准确率",
-      "tags": ["深度学习", "医学影像", "多模态融合"]
+      "description": "设计ResViTM融合架构（ResNet+ViT+Meta），在3个公开数据集（共计4199份样本）上达到96.12%准确率，性能优于多个baseline",
+      "tags": [
+        "深度学习",
+        "医学影像",
+        "多模态融合"
+      ]
     },
     {
       "title": "基于GA-TextCNN的社交媒体谣言智能检测",
       "period": "2024.4 - 2024.6",
-      "description": "创新性提出遗传算法-TextCNN混合模型，在中文谣言数据集上达到97.9%准确率",
-      "tags": ["NLP", "遗传算法", "文本分类"]
+      "description": "使用遗传算法调整TextCNN模型超参数，在中文谣言数据集上达到97.9%准确率",
+      "tags": [
+        "NLP",
+        "遗传算法",
+        "文本分类"
+      ]
     },
     {
       "title": "基于注意力机制的化学分子性质预测",
       "period": "2024.7 - 2024.9",
       "description": "设计自适应注意力权重网络，使用20万分子数据训练，MSE从978.3降至931.9",
-      "tags": ["注意力机制", "分子预测", "性能优化"]
+      "tags": [
+        "注意力机制",
+        "分子预测",
+        "性能优化"
+      ]
     }
   ],
   "papers": [
     {
+      "title": "ResViTM-Net: Where local features meet global context, guided by patient priors for medical vision",
+      "author": "第一作者",
+      "venue": "Biomedical Signal Processing and Control（SCI 二区 Top）",
+      "link": "https://www.sciencedirect.com/science/article/abs/pii/S1746809426007718"
+    },
+    {
       "title": "CViTM-Net: A Hybrid Deep Learning Method for Tuberculosis Detection in CT Images",
       "author": "第一作者",
       "venue": "IEEE CISAT 2025"
-    },
-    {
-      "title": "ResViTM-Net: Where Local Features Meet Global Context",
-      "author": "第二作者",
-      "venue": "SCI期刊审稿中"
     },
     {
       "title": "Application of Attention Mechanism-Based Neural Networks in Predicting Chemical Molecular Properties",
@@ -53,9 +85,29 @@
     }
   ],
   "skills": {
-    "编程语言": ["Python", "C/C++", "MATLAB"],
-    "深度学习": ["PyTorch", "U-Net", "ResNet", "Transformer", "ViT"],
-    "机器学习": ["随机森林", "t-SNE", "遗传算法"]
+    "编程语言": [
+      "Python",
+      "C/C++",
+      "MATLAB"
+    ],
+    "深度学习": [
+      "PyTorch",
+      "U-Net",
+      "ResNet",
+      "Transformer",
+      "ViT"
+    ],
+    "机器学习": [
+      "随机森林",
+      "t-SNE",
+      "遗传算法"
+    ],
+    "大模型微调": [
+      "SFT",
+      "DPO",
+      "GRPO",
+      "Prompt 工程"
+    ]
   },
   "links": [
     {

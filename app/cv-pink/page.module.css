@@ -69,6 +69,16 @@
   border-bottom: none;
 }
 
+.paperList a {
+  text-decoration: underline;
+  color: inherit;
+  cursor: pointer;
+}
+
+.paperList a:hover {
+  filter: brightness(0.75);
+}
+
 .projectList {
   display: flex;
   flex-direction: column;
@@ -118,7 +128,7 @@
 
 .skillsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-lg);
 }
 
@@ -131,7 +141,7 @@
 
 .linksGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-md);
 }
 

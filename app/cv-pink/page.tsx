@@ -69,7 +69,13 @@ export default async function CVPinkPage() {
           <ul className={styles.paperList}>
             {data.papers.map((paper, index) => (
               <li key={index}>
-                <strong>{paper.title}</strong>
+                {paper.link ? (
+                  <a href={paper.link} target="_blank" rel="noopener noreferrer">
+                    <strong>{paper.title}</strong>
+                  </a>
+                ) : (
+                  <strong>{paper.title}</strong>
+                )}
                 <br />
                 {paper.author} · {paper.venue}
               </li>
