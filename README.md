@@ -10,7 +10,6 @@
 - **TypeScript**: 完整的类型安全支持
 - **服务端渲染 (SSR/SSG)**: 所有数据在服务端读取，消除客户端 fetch 闪烁
 - **模块化设计**: 清晰的项目结构，易于维护和扩展
-- 预留 API 路由，为未来功能（登录、数据库、上传）预留接口
 - 响应式设计，适配各种设备尺寸
 
 ## 📁 项目结构
@@ -103,90 +102,13 @@ npm run lint
 
 数据会在服务端读取并渲染，无需重启服务器（开发模式下自动更新）。
 
-## 🎨 颜色配置
-
-所有颜色常量都定义在 `lib/colors.ts` 中：
-
-- `TECH_COLORS`: 主页科技风格色板
-- `PINK_COLORS`: 粉色简历页色板
-- `BLUE_COLORS`: 蓝色简历页色板
-- `TAG_COLOR_PALETTE`: 项目标签色板（10色）
-- `STATUS_COLORS`: 状态色（成功、警告、错误等）
-
-## 🔌 API 路由
-
-API 路由位于 `app/api/` 目录，已预留以下功能接口：
-
-- `/api/hello`: 示例 API（已实现）
-- `/api/auth/*`: 认证接口（待实现）
-- `/api/db/*`: 数据库操作接口（待实现）
-- `/api/upload/*`: 文件上传接口（待实现）
-
-### 使用示例
-
-```typescript
-// GET 请求
-const response = await fetch('/api/hello');
-const data = await response.json();
-
-// POST 请求
-const response = await fetch('/api/hello', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ message: 'Hello!' }),
-});
-```
-
-## 🚀 部署
-
-### Vercel（推荐）
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
-
-### 其他平台
-
-项目可以部署到任何支持 Next.js 的平台：
-
-- Netlify
-- AWS Amplify
-- Railway
-- 自建服务器
-
 ## 📚 文档
 
 - [开发指南](./DEVELOPMENT.md) - 详细的开发文档
 - [部署指南](./DEPLOYMENT.md) - 部署和运维文档
 
-## 🔧 扩展功能
-
-项目已预留以下功能接口：
-
-- **认证系统**: `app/api/auth/*`
-- **数据库操作**: `app/api/db/*`
-- **文件上传**: `app/api/upload/*`
-
-可根据需求自行实现。
-
-## 📄 许可证
-
-ISC License
-
-## 👤 作者
-
-**Vanilla Yukirin**
-
-- GitHub: [@Vanilla-Yukirin](https://github.com/Vanilla-Yukirin)
-- Email: contact@yukirin.me
-
-## 🙏 致谢
-
-- [Next.js](https://nextjs.org/) - React 框架
-- [TypeScript](https://www.typescriptlang.org/) - 类型系统
-- [Marked](https://marked.js.org/) - Markdown 解析器
-- [RemixIcon](https://remixicon.com/) - 图标库
-
 ---
 
+Powered by [Next.js](https://nextjs.org/) · [TypeScript](https://www.typescriptlang.org/) · [Marked](https://marked.js.org/) · [RemixIcon](https://remixicon.com/)
+
 © 2026 Vanilla Yukirin · 永远可爱 · 永远善良
-
-
