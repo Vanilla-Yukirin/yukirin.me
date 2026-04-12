@@ -332,18 +332,3 @@ npm install --save-dev @types/package-name  # 如果需要类型定义
 3. **数据加载**
    - 保持 JSON 文件精简
    - 避免加载过大的数据
-
-## 贡献指南
-
-1. Fork 仓库
-2. 创建功能分支（`git checkout -b feature/AmazingFeature`）
-3. 提交更改（`git commit -m 'Add some AmazingFeature'`）
-4. 推送到分支（`git push origin feature/AmazingFeature`）
-5. 开启 Pull Request
-
-## 参考资源
-
-- [Next.js 文档](https://nextjs.org/docs)
-- [React 文档](https://react.dev)
-- [TypeScript 文档](https://www.typescriptlang.org/docs/)
-- [CSS Modules](https://github.com/css-modules/css-modules)
