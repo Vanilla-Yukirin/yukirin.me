@@ -62,7 +62,7 @@
     },
     {
       "title": "ResViTM-Net",
-      "link": "https://github.com/Vanilla-Yukirin/ResViTM-Net",
+      "link": "https://www.sciencedirect.com/science/article/abs/pii/S1746809426007718",
       "image": "https://raw.githubusercontent.com/Vanilla-Yukirin/ResViTM-Net/main/model_output/ResViTM-20250804021325.png",
       "imagePosition": "left",
       "tags": [
@@ -71,8 +71,8 @@
         { "name": "PyTorch", "index": 2 },
         { "name": "计算机视觉", "index": 3 }
       ],
-      "description": "基于 ResNet+ViT+Meta 的 CT 图像肺结核识别模型，在 4999 份样本上达到 96.0% 准确率",
-      "comment": "求求了 Accepted 吧，欧内该瓦达西！",
+      "description": "基于 ResNet+ViT+Meta 的 CT 图像肺结核识别模型，在 4199 份样本上达到 96.12% 准确率",
+      "comment": "已发表 · SCI 二区 Top",
       "pin": true,
       "sortId": 100
     },
