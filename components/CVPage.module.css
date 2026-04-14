@@ -1,9 +1,38 @@
-/* 简历页粉色风格样式模块 */
+/* 简历页共用样式 - 通过 data-theme 属性切换主题色 */
 
+/* ── 粉色主题 ── */
+.container[data-theme='pink'] {
+  --cv-bg: #fff5f9;
+  --cv-accent: #ff9ec7;
+  --cv-card-border: #ffd6e7;
+  --cv-item-bg: #ffe8f4;
+  --cv-item-border: #ffe8f4;
+  --cv-list-divider: #ffe8f4;
+  --cv-footer-border: #ffd6e7;
+  --cv-skill-heading: #b4a7f5;
+  --cv-link-hover-bg: #ff9ec7;
+  --cv-tag-bg: #ff9ec7;
+}
+
+/* ── 蓝色主题 ── */
+.container[data-theme='blue'] {
+  --cv-bg: #f0f7ff;
+  --cv-accent: #3399FF;
+  --cv-card-border: #bee3f8;
+  --cv-item-bg: #e6f3ff;
+  --cv-item-border: #e6f3ff;
+  --cv-list-divider: #e6f3ff;
+  --cv-footer-border: #bee3f8;
+  --cv-skill-heading: #5C7CFA;
+  --cv-link-hover-bg: #3399FF;
+  --cv-tag-bg: #3399FF;
+}
+
+/* ── 布局 ── */
 .container {
   min-height: 100vh;
   padding: var(--spacing-xl);
-  background: #fff5f9;
+  background: var(--cv-bg);
   color: #2d3748;
 }
 
@@ -21,7 +50,7 @@
 .title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #ff9ec7;
+  color: var(--cv-accent);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -36,13 +65,13 @@
   padding: var(--spacing-xl);
   margin-bottom: var(--spacing-xl);
   box-shadow: var(--shadow-md);
-  border: 2px solid #ffd6e7;
+  border: 2px solid var(--cv-card-border);
 }
 
 .sectionTitle {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #ff9ec7;
+  color: var(--cv-accent);
   margin-bottom: var(--spacing-lg);
 }
 
@@ -60,7 +89,7 @@
 .achievementList li,
 .paperList li {
   padding: var(--spacing-sm) 0;
-  border-bottom: 1px solid #ffe8f4;
+  border-bottom: 1px solid var(--cv-list-divider);
   line-height: 1.8;
 }
 
@@ -87,15 +116,15 @@
 
 .projectItem {
   padding: var(--spacing-lg);
-  background: #ffe8f4;
+  background: var(--cv-item-bg);
   border-radius: var(--radius-md);
-  border: 1px solid #ffe8f4;
+  border: 1px solid var(--cv-item-border);
 }
 
 .projectItem h3 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #ff9ec7;
+  color: var(--cv-accent);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -119,7 +148,7 @@
 
 .tag {
   padding: var(--spacing-xs) var(--spacing-md);
-  background: #ff9ec7;
+  background: var(--cv-tag-bg);
   color: white;
   border-radius: var(--radius-md);
   font-size: 0.875rem;
@@ -135,7 +164,7 @@
 .skillCategory h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: #b4a7f5;
+  color: var(--cv-skill-heading);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -150,14 +179,14 @@
   align-items: center;
   gap: var(--spacing-md);
   padding: var(--spacing-lg);
-  background: #ffe8f4;
+  background: var(--cv-item-bg);
   border-radius: var(--radius-md);
-  border: 1px solid #ffe8f4;
+  border: 1px solid var(--cv-item-border);
   transition: all var(--transition-base);
 }
 
 .linkItem:hover {
-  background: #ff9ec7;
+  background: var(--cv-link-hover-bg);
   color: white;
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
@@ -181,7 +210,7 @@
   text-align: center;
   padding: var(--spacing-2xl) 0;
   color: #4a5568;
-  border-top: 2px solid #ffd6e7;
+  border-top: 2px solid var(--cv-footer-border);
   margin-top: var(--spacing-xl);
 }
 

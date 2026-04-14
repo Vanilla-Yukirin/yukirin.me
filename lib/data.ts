@@ -54,21 +54,11 @@ export async function getAboutContent(): Promise<string> {
 }
 
 /**
- * 读取简历页数据（粉色版）（服务端）
+ * 读取简历页数据（服务端）
  * @returns 简历数据对象
  */
-export async function getCVPinkData(): Promise<CVData> {
-  const dataPath = getDataPath('cv-pink.json');
-  const fileContent = fs.readFileSync(dataPath, 'utf-8');
-  return JSON.parse(fileContent) as CVData;
-}
-
-/**
- * 读取简历页数据（蓝色版）（服务端）
- * @returns 简历数据对象
- */
-export async function getCVBlueData(): Promise<CVData> {
-  const dataPath = getDataPath('cv-blue.json');
+export async function getCVData(): Promise<CVData> {
+  const dataPath = getDataPath('cv.json');
   const fileContent = fs.readFileSync(dataPath, 'utf-8');
   return JSON.parse(fileContent) as CVData;
 }
