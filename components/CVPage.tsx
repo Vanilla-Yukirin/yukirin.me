@@ -41,6 +41,29 @@ export default function CVPage({ data, theme }: CVPageProps) {
           </ul>
         </section>
 
+        {/* 实习经历 */}
+        {data.internships && data.internships.length > 0 && (
+          <section className={styles.card}>
+            <h2 className={styles.sectionTitle}>💼 实习经历</h2>
+            <div className={styles.projectList}>
+              {data.internships.map((item, index) => (
+                <div key={index} className={styles.projectItem}>
+                  <h3>{item.title}</h3>
+                  <p className={styles.projectPeriod}>{item.period}</p>
+                  <p className={styles.projectDesc}>{item.description}</p>
+                  <div className={styles.projectTags}>
+                    {item.tags.map((tag, tagIndex) => (
+                      <span key={tagIndex} className={styles.tag}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* 项目经历 */}
         <section className={styles.card}>
           <h2 className={styles.sectionTitle}>🔬 项目经历</h2>

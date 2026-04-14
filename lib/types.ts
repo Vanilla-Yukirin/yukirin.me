@@ -66,6 +66,16 @@ export interface CVPersonalInfo {
 }
 
 /**
+ * 简历页实习经历类型
+ */
+export interface CVInternship {
+  title: string;
+  period: string;
+  description: string;
+  tags: string[];
+}
+
+/**
  * 简历页项目类型
  */
 export interface CVProject {
@@ -101,6 +111,7 @@ export interface CVLink {
 export interface CVData {
   personal: CVPersonalInfo;
   achievements: string[];
+  internships?: CVInternship[];
   projects: CVProject[];
   papers: Paper[];
   skills: Record<string, string[]>;

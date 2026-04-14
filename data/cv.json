@@ -21,6 +21,19 @@
     "🥇 长三角数学建模竞赛浙江赛区一等奖（2024）",
     "🏆 全国青少年信息学奥林匹克联赛 NOIP 一等奖（2020）"
   ],
+  "internships": [
+    {
+      "title": "同花顺摘星计划（A-Star）· 研发工程师实习",
+      "period": "2026.04 - 至今",
+      "description": "参与 B2C 部门 AI Gateway 基础设施建设，负责 LiteLLM 二次开发与功能扩展",
+      "tags": [
+        "Python",
+        "LiteLLM",
+        "AI Gateway",
+        "LLM Infra"
+      ]
+    }
+  ],
   "projects": [
     {
       "title": "基于 FunASR-nano 的动漫音频垂直领域语音识别微调",
