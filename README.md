@@ -104,6 +104,12 @@ npm run lint
 
 ## 📚 文档
 
+### 访问统计
+
+`components/GoatCounter.tsx` 接入 [cnt.yukirin.me](https://cnt.yukirin.me/)（xcy 的主页 Site 3），与博客 `blog-cnt.yukirin.me` 分开统计。Umami 的现有脚本和网站 ID 保持原样，前端没有管理员或 API 凭据。
+
+仅生产构建的 `https://yukirin.me` 和 `https://www.yukirin.me` 启用采集，本地预览及其他域名不发送请求。客户端在页面加载后异步载入，最多等待 4 秒；App Router 的路径变化会记录新的页面，查询参数和锚点不拆成独立页面。沿用 GoatCounter 默认会话去重，重复刷新不一定增加计数。后续 Hanami 可使用本侧只读 API 获取主页统计。
+
 - [开发指南](./DEVELOPMENT.md) - 详细的开发文档
 - [部署指南](./DEPLOYMENT.md) - 部署和运维文档
 

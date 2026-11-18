@@ -2,6 +2,14 @@
 
 本文档详细介绍如何在自己的服务器上部署 Next.js 项目。
 
+## 当前生产状态（2026-11-18）
+
+主页运行在 xcy 的 `/var/www/yukirin.me`，Nginx 转发到本机 3000 端口，PM2 进程名为 `yukirin-site`。本次发现原应用进程未运行导致 502，已从现有构建恢复，并为 PM2 配置 systemd 开机恢复；`pm2 save` 保留当前应用清单。
+
+GoatCounter 通过根布局中的 `components/GoatCounter.tsx` 接入 `cnt.yukirin.me`，Umami 保持原样。发布仍由 main 的 GitHub Actions 完成；先确认服务器 tracked 文件干净，只 fast-forward 到触发 workflow 的提交，再运行统计回归、构建和 PM2 reload。`node --test tests/goatcounter.test.cjs` 覆盖本地禁用、路由切换、加载竞态和超时。
+
+接入前的源码、Next.js 构建和必要配置已保存在 xcy `/var/backups/home-counter/20261118T012715Z/`。恢复目录含私有配置，只供主机管理员使用；业务源码回滚优先采用 Git revert 后重新发布。统计数据库独立保留，不随网站代码回滚删除。
+
 ## 环境要求
 
 - **服务器系统**: Ubuntu 20.04+ / CentOS 7+ / Debian 10+
