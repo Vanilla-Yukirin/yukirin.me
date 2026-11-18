@@ -16,7 +16,8 @@ function page(origin = 'https://yukirin.me', mode = 'production') {
   const exports = {};
   vm.runInNewContext(compiled, { exports, window, location: { origin }, process: { env: { NODE_ENV: mode } },
     document: { readyState: 'complete', title: 'Test page',
-      createElement: () => ({ dataset: {}, remove() {} }), head: { appendChild: s => scripts.push(s) } },
+      createElement: () => ({ dataset: {}, removed: false, remove() { this.removed = true; } }),
+      head: { appendChild: s => scripts.push(s) } },
     require(name) {
       if (name === 'react') return { useEffect: fn => { cleanup = fn(); } };
       if (name === 'next/navigation') return { usePathname: () => path };
@@ -24,7 +25,16 @@ function page(origin = 'https://yukirin.me', mode = 'production') {
     } });
   return { scripts, timers, visits,
     render(next = '/') { cleanup?.(); path = next; exports.default(); },
-    loaded() { window.goatcounter.count = visit => visits.push(visit.path); scripts[0].onload(); },
+    loaded() {
+      // The official client resolves its endpoint when count() is called, including SPA navigation.
+      window.goatcounter.count = visit => {
+        const tag = scripts.find(script => !script.removed && script.dataset.goatcounter);
+        const endpoint = tag?.dataset.goatcounter || window.goatcounter.endpoint;
+        assert.equal(endpoint, 'https://cnt.yukirin.me/count', 'count() needs a live endpoint');
+        visits.push(visit.path);
+      };
+      scripts[0].onload();
+    },
   };
 }
 

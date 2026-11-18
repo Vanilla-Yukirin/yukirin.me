@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 type Counter = {
   no_onload: boolean;
   no_events: boolean;
+  endpoint: string;
   count?: (visit: { path: string; title: string }) => void;
 };
 
@@ -19,7 +20,8 @@ let client: Promise<Counter | null> | undefined;
 function loadClient(): Promise<Counter | null> {
   if (client) return client;
   client = new Promise((resolve) => {
-    window.goatcounter = { no_onload: true, no_events: true };
+    // Keep the endpoint after the loader tag is removed, including later SPA pageviews.
+    window.goatcounter = { no_onload: true, no_events: true, endpoint: 'https://cnt.yukirin.me/count' };
     const script = document.createElement('script');
     script.async = true;
     script.src = 'https://cnt.yukirin.me/count.js';
