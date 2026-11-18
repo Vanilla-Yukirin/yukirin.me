@@ -6,6 +6,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import GlobalLoader from '@/components/GlobalLoader';
+import GoatCounter from '@/components/GoatCounter';
 
 /**
  * 网站元数据配置
@@ -67,6 +68,7 @@ export default function RootLayout({
       </head>
       <body>
         <GlobalLoader />
+        <GoatCounter />
         {children}
       </body>
     </html>

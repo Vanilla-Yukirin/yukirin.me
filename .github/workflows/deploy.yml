@@ -13,6 +13,7 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         # 注入 SILICONFLOW 环境变量
         env:
+          TARGET_SHA: ${{ github.sha }}
           SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
           SILICONFLOW_BASE_URL: ${{ secrets.SILICONFLOW_BASE_URL }}
           SHENGSUAN_API_KEY: ${{ secrets.SHENGSUAN_API_KEY }}
@@ -26,7 +27,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           # 通过ssh-action传环境变量
-          envs: SILICONFLOW_API_KEY,SILICONFLOW_BASE_URL,SHENGSUAN_API_KEY,SHENGSUAN_BASE_URL,XIAOHUMI_API_KEY,XIAOHUMI_BASE_URL,OPENAIHK_API_KEY,OPENAIHK_BASE_URL
+          envs: TARGET_SHA,SILICONFLOW_API_KEY,SILICONFLOW_BASE_URL,SHENGSUAN_API_KEY,SHENGSUAN_BASE_URL,XIAOHUMI_API_KEY,XIAOHUMI_BASE_URL,OPENAIHK_API_KEY,OPENAIHK_BASE_URL
           port: 22000
           script: |
             # -1. 设置脚本出错即退出
@@ -47,10 +48,13 @@ jobs:
             cd /var/www/yukirin.me
 
             # 2. 获取远程最新代码
-            git fetch --all
+            git diff --quiet
+            git diff --cached --quiet
+            git fetch origin main
 
-            # 3. 强制重置本地代码到远程的 main 分支（解决冲突）
-            git reset --hard origin/main
+            # 3. 只发布触发本次 workflow 的 main 提交，保留服务器本地改动
+            test "$(git rev-parse origin/main)" = "$TARGET_SHA"
+            git merge --ff-only "$TARGET_SHA"
             
             # 3.5 注入当前提交信息到环境变量（构建时可用）
             # export NEXT_PUBLIC_COMMIT_SHA=$(git rev-parse --short HEAD)
@@ -85,6 +89,8 @@ jobs:
             # 5. 安装依赖
             echo "📦 安装依赖..."
             npm ci
+
+            node --test tests/goatcounter.test.cjs
 
             # 6. 构建 Next.js 应用（生成 .next 目录）
             echo "🏗️ 开始构建..."
